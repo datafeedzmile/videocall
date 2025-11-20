@@ -100,6 +100,16 @@
             opacity: 0.6;
         }
 
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            background: #666;
+        }
+
+        .btn-small:hover {
+            background: #777;
+        }
+
         .btn-status {
             position: absolute;
             top: -5px;
@@ -211,6 +221,10 @@
             text-align: center;
             letter-spacing: 4px;
             color: #4CAF50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .button-group {
@@ -226,6 +240,18 @@
             font-size: 20px;
             letter-spacing: 2px;
         }
+
+        .code-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .code-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
     </style>
 </head>
 <body>
@@ -237,7 +263,12 @@
         <div id="setup">
             <div class="input-group">
                 <label>Your Code (share this):</label>
-                <div id="myPeerId">------</div>
+                <div class="code-container">
+                    <div class="code-display">
+                        <div id="myPeerId">------</div>
+                    </div>
+                    <button class="btn-small" onclick="generateNewCode()">Generate New Code</button>
+                </div>
             </div>
 
             <div class="input-group">
@@ -314,6 +345,8 @@
         let animationFrameId;
         let myShortId;
 
+        const STORAGE_KEY = 'videocall_peer_id';
+
         // Generate a random 6-character alphanumeric code
         function generateShortId() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -324,13 +357,47 @@
             return result;
         }
 
+        // Get stored ID or generate new one
+        function getOrCreateId() {
+            let storedId = localStorage.getItem(STORAGE_KEY);
+            if (storedId && storedId.length === 6) {
+                return storedId;
+            }
+            const newId = generateShortId();
+            localStorage.setItem(STORAGE_KEY, newId);
+            return newId;
+        }
+
+        // Generate new code (user requested)
+        function generateNewCode() {
+            if (currentCall) {
+                alert('Please end the current call first');
+                return;
+            }
+            
+            const newId = generateShortId();
+            localStorage.setItem(STORAGE_KEY, newId);
+            
+            // Destroy old peer and create new one
+            if (peer) {
+                peer.destroy();
+            }
+            
+            myShortId = newId;
+            document.getElementById('myPeerId').textContent = newId;
+            document.getElementById('status').textContent = 'Generating new code...';
+            
+            // Reinitialize with new ID
+            init();
+        }
+
         // Initialize PeerJS
         async function init() {
             try {
-                // Generate a short ID
-                myShortId = generateShortId();
+                // Get or create persistent ID
+                myShortId = getOrCreateId();
                 
-                // Create a new peer with our custom short ID
+                // Create a new peer with our stored/generated ID
                 peer = new Peer(myShortId, {
                     debug: 2
                 });
@@ -343,10 +410,12 @@
                 peer.on('error', (error) => {
                     console.error('Peer error:', error);
                     
-                    // If ID is taken, generate a new one
+                    // If ID is taken, generate a new one and store it
                     if (error.type === 'unavailable-id') {
-                        document.getElementById('status').textContent = 'Generating new code...';
-                        myShortId = generateShortId();
+                        document.getElementById('status').textContent = 'Code conflict, generating new one...';
+                        const newId = generateShortId();
+                        localStorage.setItem(STORAGE_KEY, newId);
+                        myShortId = newId;
                         peer = new Peer(myShortId, { debug: 2 });
                         // Re-attach event listeners
                         attachPeerListeners();
