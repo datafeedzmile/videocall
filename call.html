@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Video Call</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+
+        .controls {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #aaa;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            background: #333;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px 24px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+            position: relative;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #da190b;
+        }
+
+        .btn-secondary {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #0b7dda;
+        }
+
+        .btn-secondary.disabled {
+            background: #666;
+            opacity: 0.6;
+        }
+
+        .btn-status {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #2a2a2a;
+        }
+
+        .btn-status.active {
+            background: #4CAF50;
+        }
+
+        .btn-status.inactive {
+            background: #f44336;
+        }
+
+        #status {
+            margin: 10px 0;
+            padding: 10px;
+            background: #333;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .videos {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .video-container {
+            position: relative;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        video {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            display: block;
+        }
+
+        .video-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .audio-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mic-icon {
+            font-size: 20px;
+        }
+
+        .mic-bars {
+            display: flex;
+            gap: 3px;
+            align-items: flex-end;
+            height: 30px;
+            flex: 1;
+        }
+
+        .mic-bar {
+            flex: 1;
+            background: #333;
+            border-radius: 2px;
+            transition: background 0.1s, height 0.1s;
+            min-height: 4px;
+        }
+
+        .mic-bar.active {
+            background: #4CAF50;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #myPeerId {
+            word-break: break-all;
+            background: #444;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎥 Simple Video Call</h1>
+
+    <div class="controls">
+        <div id="status">Initializing...</div>
+
+        <div id="setup">
+            <div class="input-group">
+                <label>Your ID (share this with the other person):</label>
+                <div id="myPeerId">Generating...</div>
+            </div>
+
+            <div class="input-group">
+                <label for="peerIdInput">Enter the other person's ID to call:</label>
+                <input type="text" id="peerIdInput" placeholder="Paste their ID here">
+            </div>
+
+            <button class="btn-primary" onclick="startCall()">Start Call</button>
+        </div>
+
+        <div id="callControls" class="hidden">
+            <div class="button-group">
+                <button class="btn-danger" onclick="endCall()">End Call</button>
+                <button class="btn-secondary" id="videoBtn" onclick="toggleVideo()">
+                    <span class="btn-status active"></span>
+                    Video
+                </button>
+                <button class="btn-secondary" id="audioBtn" onclick="toggleAudio()">
+                    <span class="btn-status active"></span>
+                    Audio
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="videos">
+        <div class="video-container">
+            <div class="video-label">You</div>
+            <video id="localVideo" autoplay muted playsinline></video>
+            <div class="audio-indicator" id="localAudioIndicator">
+                <span class="mic-icon">🎤</span>
+                <div class="mic-bars">
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                </div>
+            </div>
+        </div>
+        <div class="video-container hidden" id="remoteContainer">
+            <div class="video-label">Other Person</div>
+            <video id="remoteVideo" autoplay playsinline></video>
+            <div class="audio-indicator" id="remoteAudioIndicator">
+                <span class="mic-icon">🎤</span>
+                <div class="mic-bars">
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script>
+        let peer;
+        let localStream;
+        let currentCall;
+        let isVideoEnabled = true;
+        let isAudioEnabled = true;
+        let localAudioContext;
+        let localAnalyser;
+        let remoteAudioContext;
+        let remoteAnalyser;
+        let animationFrameId;
+
+        // Initialize PeerJS
+        async function init() {
+            try {
+                // Create a new peer with a random ID
+                peer = new Peer();
+
+                peer.on('open', (id) => {
+                    document.getElementById('myPeerId').textContent = id;
+                    document.getElementById('status').textContent = 'Ready! Share your ID with the other person.';
+                });
+
+                peer.on('error', (error) => {
+                    console.error('Peer error:', error);
+                    document.getElementById('status').textContent = 'Error: ' + error.message;
+                });
+
+                // Handle incoming calls
+                peer.on('call', async (call) => {
+                    document.getElementById('status').textContent = 'Incoming call...';
+                    
+                    // Get local stream
+                    if (!localStream) {
+                        await getLocalStream();
+                    }
+
+                    // Answer the call with our stream
+                    call.answer(localStream);
+                    currentCall = call;
+
+                    // Handle the remote stream
+                    call.on('stream', (remoteStream) => {
+                        document.getElementById('remoteVideo').srcObject = remoteStream;
+                        document.getElementById('remoteContainer').classList.remove('hidden');
+                        document.getElementById('status').textContent = 'Connected!';
+                        document.getElementById('setup').classList.add('hidden');
+                        document.getElementById('callControls').classList.remove('hidden');
+                        
+                        // Setup audio visualization for remote stream
+                        setupAudioVisualization(remoteStream, 'remote');
+                    });
+
+                    call.on('close', () => {
+                        endCall();
+                    });
+                });
+
+            } catch (error) {
+                console.error('Initialization error:', error);
+                document.getElementById('status').textContent = 'Error initializing: ' + error.message;
+            }
+        }
+
+        // Get local video/audio stream
+        async function getLocalStream() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+                document.getElementById('localVideo').srcObject = localStream;
+                
+                // Setup audio visualization for local stream
+                setupAudioVisualization(localStream, 'local');
+                
+                return localStream;
+            } catch (error) {
+                console.error('Error accessing media devices:', error);
+                alert('Could not access camera/microphone. Please grant permissions.');
+                throw error;
+            }
+        }
+
+        // Setup audio visualization
+        function setupAudioVisualization(stream, type) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaStreamSource(stream);
+            
+            analyser.fftSize = 256;
+            source.connect(analyser);
+            
+            if (type === 'local') {
+                localAudioContext = audioContext;
+                localAnalyser = analyser;
+            } else {
+                remoteAudioContext = audioContext;
+                remoteAnalyser = analyser;
+            }
+            
+            // Start visualization
+            if (!animationFrameId) {
+                visualizeAudio();
+            }
+        }
+
+        // Visualize audio levels
+        function visualizeAudio() {
+            animationFrameId = requestAnimationFrame(visualizeAudio);
+            
+            // Visualize local audio
+            if (localAnalyser && isAudioEnabled) {
+                const dataArray = new Uint8Array(localAnalyser.frequencyBinCount);
+                localAnalyser.getByteFrequencyData(dataArray);
+                updateBars('localAudioIndicator', dataArray);
+            } else {
+                clearBars('localAudioIndicator');
+            }
+            
+            // Visualize remote audio
+            if (remoteAnalyser) {
+                const dataArray = new Uint8Array(remoteAnalyser.frequencyBinCount);
+                remoteAnalyser.getByteFrequencyData(dataArray);
+                updateBars('remoteAudioIndicator', dataArray);
+            }
+        }
+
+        // Update audio bars
+        function updateBars(indicatorId, dataArray) {
+            const indicator = document.getElementById(indicatorId);
+            const bars = indicator.querySelectorAll('.mic-bar');
+            
+            // Calculate average volume
+            let sum = 0;
+            for (let i = 0; i < dataArray.length; i++) {
+                sum += dataArray[i];
+            }
+            const average = sum / dataArray.length;
+            
+            // Update each bar based on volume level
+            bars.forEach((bar, index) => {
+                const threshold = (index + 1) * (255 / bars.length);
+                if (average > threshold) {
+                    bar.classList.add('active');
+                    bar.style.height = Math.min(100, (average / 255) * 100) + '%';
+                } else {
+                    bar.classList.remove('active');
+                    bar.style.height = '4px';
+                }
+            });
+        }
+
+        // Clear audio bars
+        function clearBars(indicatorId) {
+            const indicator = document.getElementById(indicatorId);
+            const bars = indicator.querySelectorAll('.mic-bar');
+            bars.forEach(bar => {
+                bar.classList.remove('active');
+                bar.style.height = '4px';
+            });
+        }
+
+        // Start a call to another peer
+        async function startCall() {
+            const remotePeerId = document.getElementById('peerIdInput').value.trim();
+            
+            if (!remotePeerId) {
+                alert('Please enter the other person\'s ID');
+                return;
+            }
+
+            document.getElementById('status').textContent = 'Connecting...';
+
+            try {
+                // Get local stream if we don't have it
+                if (!localStream) {
+                    await getLocalStream();
+                }
+
+                // Make the call
+                currentCall = peer.call(remotePeerId, localStream);
+
+                // Handle the remote stream
+                currentCall.on('stream', (remoteStream) => {
+                    document.getElementById('remoteVideo').srcObject = remoteStream;
+                    document.getElementById('remoteContainer').classList.remove('hidden');
+                    document.getElementById('status').textContent = 'Connected!';
+                    document.getElementById('setup').classList.add('hidden');
+                    document.getElementById('callControls').classList.remove('hidden');
+                    
+                    // Setup audio visualization for remote stream
+                    setupAudioVisualization(remoteStream, 'remote');
+                });
+
+                currentCall.on('close', () => {
+                    endCall();
+                });
+
+                currentCall.on('error', (error) => {
+                    console.error('Call error:', error);
+                    document.getElementById('status').textContent = 'Call failed: ' + error.message;
+                });
+
+            } catch (error) {
+                console.error('Error starting call:', error);
+                document.getElementById('status').textContent = 'Failed to start call';
+            }
+        }
+
+        // End the current call
+        function endCall() {
+            if (currentCall) {
+                currentCall.close();
+            }
+
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+
+            // Stop audio visualization
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+
+            // Close audio contexts
+            if (localAudioContext) {
+                localAudioContext.close();
+                localAudioContext = null;
+                localAnalyser = null;
+            }
+            if (remoteAudioContext) {
+                remoteAudioContext.close();
+                remoteAudioContext = null;
+                remoteAnalyser = null;
+            }
+
+            document.getElementById('localVideo').srcObject = null;
+            document.getElementById('remoteVideo').srcObject = null;
+            document.getElementById('remoteContainer').classList.add('hidden');
+            document.getElementById('setup').classList.remove('hidden');
+            document.getElementById('callControls').classList.add('hidden');
+            document.getElementById('status').textContent = 'Call ended. Ready for next call.';
+            
+            // Reset button states
+            isVideoEnabled = true;
+            isAudioEnabled = true;
+            updateButtonStatus();
+            
+            currentCall = null;
+        }
+
+        // Toggle video on/off
+        function toggleVideo() {
+            if (localStream) {
+                isVideoEnabled = !isVideoEnabled;
+                localStream.getVideoTracks().forEach(track => {
+                    track.enabled = isVideoEnabled;
+                });
+                updateButtonStatus();
+            }
+        }
+
+        // Toggle audio on/off
+        function toggleAudio() {
+            if (localStream) {
+                isAudioEnabled = !isAudioEnabled;
+                localStream.getAudioTracks().forEach(track => {
+                    track.enabled = isAudioEnabled;
+                });
+                updateButtonStatus();
+                
+                // Clear bars when audio is disabled
+                if (!isAudioEnabled) {
+                    clearBars('localAudioIndicator');
+                }
+            }
+        }
+
+        // Update button status indicators
+        function updateButtonStatus() {
+            const videoBtn = document.getElementById('videoBtn');
+            const audioBtn = document.getElementById('audioBtn');
+            
+            const videoStatus = videoBtn.querySelector('.btn-status');
+            const audioStatus = audioBtn.querySelector('.btn-status');
+            
+            if (isVideoEnabled) {
+                videoStatus.classList.remove('inactive');
+                videoStatus.classList.add('active');
+                videoBtn.classList.remove('disabled');
+            } else {
+                videoStatus.classList.remove('active');
+                videoStatus.classList.add('inactive');
+                videoBtn.classList.add('disabled');
+            }
+            
+            if (isAudioEnabled) {
+                audioStatus.classList.remove('inactive');
+                audioStatus.classList.add('active');
+                audioBtn.classList.remove('disabled');
+            } else {
+                audioStatus.classList.remove('active');
+                audioStatus.classList.add('inactive');
+                audioBtn.classList.add('disabled');
+            }
+        }
+
+        // Initialize on page load
+        init();
+    </script>
+</body>
+</html>
