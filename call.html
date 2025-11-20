@@ -65,6 +65,7 @@
             font-size: 16px;
             font-weight: bold;
             transition: background 0.3s;
+            position: relative;
         }
 
         .btn-primary {
@@ -92,6 +93,29 @@
 
         .btn-secondary:hover {
             background: #0b7dda;
+        }
+
+        .btn-secondary.disabled {
+            background: #666;
+            opacity: 0.6;
+        }
+
+        .btn-status {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #2a2a2a;
+        }
+
+        .btn-status.active {
+            background: #4CAF50;
+        }
+
+        .btn-status.inactive {
+            background: #f44336;
         }
 
         #status {
@@ -135,6 +159,43 @@
             font-size: 14px;
         }
 
+        .audio-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mic-icon {
+            font-size: 20px;
+        }
+
+        .mic-bars {
+            display: flex;
+            gap: 3px;
+            align-items: flex-end;
+            height: 30px;
+            flex: 1;
+        }
+
+        .mic-bar {
+            flex: 1;
+            background: #333;
+            border-radius: 2px;
+            transition: background 0.1s, height 0.1s;
+            min-height: 4px;
+        }
+
+        .mic-bar.active {
+            background: #4CAF50;
+        }
+
         .hidden {
             display: none;
         }
@@ -145,6 +206,13 @@
             padding: 10px;
             border-radius: 5px;
             margin: 10px 0;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
         }
     </style>
 </head>
@@ -169,9 +237,17 @@
         </div>
 
         <div id="callControls" class="hidden">
-            <button class="btn-danger" onclick="endCall()">End Call</button>
-            <button class="btn-secondary" onclick="toggleVideo()">Toggle Video</button>
-            <button class="btn-secondary" onclick="toggleAudio()">Toggle Audio</button>
+            <div class="button-group">
+                <button class="btn-danger" onclick="endCall()">End Call</button>
+                <button class="btn-secondary" id="videoBtn" onclick="toggleVideo()">
+                    <span class="btn-status active"></span>
+                    Video
+                </button>
+                <button class="btn-secondary" id="audioBtn" onclick="toggleAudio()">
+                    <span class="btn-status active"></span>
+                    Audio
+                </button>
+            </div>
         </div>
     </div>
 
@@ -179,10 +255,36 @@
         <div class="video-container">
             <div class="video-label">You</div>
             <video id="localVideo" autoplay muted playsinline></video>
+            <div class="audio-indicator" id="localAudioIndicator">
+                <span class="mic-icon">🎤</span>
+                <div class="mic-bars">
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                </div>
+            </div>
         </div>
-        <div class="video-container" id="remoteContainer" class="hidden">
+        <div class="video-container hidden" id="remoteContainer">
             <div class="video-label">Other Person</div>
             <video id="remoteVideo" autoplay playsinline></video>
+            <div class="audio-indicator" id="remoteAudioIndicator">
+                <span class="mic-icon">🎤</span>
+                <div class="mic-bars">
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                    <div class="mic-bar"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -193,6 +295,11 @@
         let currentCall;
         let isVideoEnabled = true;
         let isAudioEnabled = true;
+        let localAudioContext;
+        let localAnalyser;
+        let remoteAudioContext;
+        let remoteAnalyser;
+        let animationFrameId;
 
         // Initialize PeerJS
         async function init() {
@@ -230,6 +337,9 @@
                         document.getElementById('status').textContent = 'Connected!';
                         document.getElementById('setup').classList.add('hidden');
                         document.getElementById('callControls').classList.remove('hidden');
+                        
+                        // Setup audio visualization for remote stream
+                        setupAudioVisualization(remoteStream, 'remote');
                     });
 
                     call.on('close', () => {
@@ -251,12 +361,95 @@
                     audio: true
                 });
                 document.getElementById('localVideo').srcObject = localStream;
+                
+                // Setup audio visualization for local stream
+                setupAudioVisualization(localStream, 'local');
+                
                 return localStream;
             } catch (error) {
                 console.error('Error accessing media devices:', error);
                 alert('Could not access camera/microphone. Please grant permissions.');
                 throw error;
             }
+        }
+
+        // Setup audio visualization
+        function setupAudioVisualization(stream, type) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaStreamSource(stream);
+            
+            analyser.fftSize = 256;
+            source.connect(analyser);
+            
+            if (type === 'local') {
+                localAudioContext = audioContext;
+                localAnalyser = analyser;
+            } else {
+                remoteAudioContext = audioContext;
+                remoteAnalyser = analyser;
+            }
+            
+            // Start visualization
+            if (!animationFrameId) {
+                visualizeAudio();
+            }
+        }
+
+        // Visualize audio levels
+        function visualizeAudio() {
+            animationFrameId = requestAnimationFrame(visualizeAudio);
+            
+            // Visualize local audio
+            if (localAnalyser && isAudioEnabled) {
+                const dataArray = new Uint8Array(localAnalyser.frequencyBinCount);
+                localAnalyser.getByteFrequencyData(dataArray);
+                updateBars('localAudioIndicator', dataArray);
+            } else {
+                clearBars('localAudioIndicator');
+            }
+            
+            // Visualize remote audio
+            if (remoteAnalyser) {
+                const dataArray = new Uint8Array(remoteAnalyser.frequencyBinCount);
+                remoteAnalyser.getByteFrequencyData(dataArray);
+                updateBars('remoteAudioIndicator', dataArray);
+            }
+        }
+
+        // Update audio bars
+        function updateBars(indicatorId, dataArray) {
+            const indicator = document.getElementById(indicatorId);
+            const bars = indicator.querySelectorAll('.mic-bar');
+            
+            // Calculate average volume
+            let sum = 0;
+            for (let i = 0; i < dataArray.length; i++) {
+                sum += dataArray[i];
+            }
+            const average = sum / dataArray.length;
+            
+            // Update each bar based on volume level
+            bars.forEach((bar, index) => {
+                const threshold = (index + 1) * (255 / bars.length);
+                if (average > threshold) {
+                    bar.classList.add('active');
+                    bar.style.height = Math.min(100, (average / 255) * 100) + '%';
+                } else {
+                    bar.classList.remove('active');
+                    bar.style.height = '4px';
+                }
+            });
+        }
+
+        // Clear audio bars
+        function clearBars(indicatorId) {
+            const indicator = document.getElementById(indicatorId);
+            const bars = indicator.querySelectorAll('.mic-bar');
+            bars.forEach(bar => {
+                bar.classList.remove('active');
+                bar.style.height = '4px';
+            });
         }
 
         // Start a call to another peer
@@ -286,6 +479,9 @@
                     document.getElementById('status').textContent = 'Connected!';
                     document.getElementById('setup').classList.add('hidden');
                     document.getElementById('callControls').classList.remove('hidden');
+                    
+                    // Setup audio visualization for remote stream
+                    setupAudioVisualization(remoteStream, 'remote');
                 });
 
                 currentCall.on('close', () => {
@@ -314,12 +510,35 @@
                 localStream = null;
             }
 
+            // Stop audio visualization
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+
+            // Close audio contexts
+            if (localAudioContext) {
+                localAudioContext.close();
+                localAudioContext = null;
+                localAnalyser = null;
+            }
+            if (remoteAudioContext) {
+                remoteAudioContext.close();
+                remoteAudioContext = null;
+                remoteAnalyser = null;
+            }
+
             document.getElementById('localVideo').srcObject = null;
             document.getElementById('remoteVideo').srcObject = null;
             document.getElementById('remoteContainer').classList.add('hidden');
             document.getElementById('setup').classList.remove('hidden');
             document.getElementById('callControls').classList.add('hidden');
             document.getElementById('status').textContent = 'Call ended. Ready for next call.';
+            
+            // Reset button states
+            isVideoEnabled = true;
+            isAudioEnabled = true;
+            updateButtonStatus();
             
             currentCall = null;
         }
@@ -331,6 +550,7 @@
                 localStream.getVideoTracks().forEach(track => {
                     track.enabled = isVideoEnabled;
                 });
+                updateButtonStatus();
             }
         }
 
@@ -341,6 +561,41 @@
                 localStream.getAudioTracks().forEach(track => {
                     track.enabled = isAudioEnabled;
                 });
+                updateButtonStatus();
+                
+                // Clear bars when audio is disabled
+                if (!isAudioEnabled) {
+                    clearBars('localAudioIndicator');
+                }
+            }
+        }
+
+        // Update button status indicators
+        function updateButtonStatus() {
+            const videoBtn = document.getElementById('videoBtn');
+            const audioBtn = document.getElementById('audioBtn');
+            
+            const videoStatus = videoBtn.querySelector('.btn-status');
+            const audioStatus = audioBtn.querySelector('.btn-status');
+            
+            if (isVideoEnabled) {
+                videoStatus.classList.remove('inactive');
+                videoStatus.classList.add('active');
+                videoBtn.classList.remove('disabled');
+            } else {
+                videoStatus.classList.remove('active');
+                videoStatus.classList.add('inactive');
+                videoBtn.classList.add('disabled');
+            }
+            
+            if (isAudioEnabled) {
+                audioStatus.classList.remove('inactive');
+                audioStatus.classList.add('active');
+                audioBtn.classList.remove('disabled');
+            } else {
+                audioStatus.classList.remove('active');
+                audioStatus.classList.add('inactive');
+                audioBtn.classList.add('disabled');
             }
         }
 
