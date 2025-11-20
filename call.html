@@ -136,6 +136,33 @@
             text-align: center;
         }
 
+        #diagnostics {
+            margin: 10px 0;
+            padding: 10px;
+            background: #1a1a1a;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #888;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .diagnostic-line {
+            margin: 3px 0;
+        }
+
+        .diagnostic-error {
+            color: #f44336;
+        }
+
+        .diagnostic-success {
+            color: #4CAF50;
+        }
+
+        .diagnostic-warning {
+            color: #ff9800;
+        }
+
         .videos {
             display: flex;
             gap: 20px;
@@ -259,6 +286,7 @@
 
     <div class="controls">
         <div id="status">Initializing...</div>
+        <div id="diagnostics"></div>
 
         <div id="setup">
             <div class="input-group">
@@ -347,6 +375,17 @@
 
         const STORAGE_KEY = 'videocall_peer_id';
 
+        // Diagnostic logging
+        function logDiagnostic(message, type = 'info') {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+            const diagnosticsDiv = document.getElementById('diagnostics');
+            const line = document.createElement('div');
+            line.className = `diagnostic-line diagnostic-${type}`;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            diagnosticsDiv.appendChild(line);
+            diagnosticsDiv.scrollTop = diagnosticsDiv.scrollHeight;
+        }
+
         // Generate a random 6-character alphanumeric code
         function generateShortId() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -361,10 +400,12 @@
         function getOrCreateId() {
             let storedId = localStorage.getItem(STORAGE_KEY);
             if (storedId && storedId.length === 6) {
+                logDiagnostic(`Loaded saved ID: ${storedId}`, 'success');
                 return storedId;
             }
             const newId = generateShortId();
             localStorage.setItem(STORAGE_KEY, newId);
+            logDiagnostic(`Generated new ID: ${newId}`, 'success');
             return newId;
         }
 
@@ -377,6 +418,7 @@
             
             const newId = generateShortId();
             localStorage.setItem(STORAGE_KEY, newId);
+            logDiagnostic(`User requested new ID: ${newId}`, 'warning');
             
             // Destroy old peer and create new one
             if (peer) {
@@ -391,24 +433,53 @@
             init();
         }
 
-        // Initialize PeerJS
+        // Initialize PeerJS with STUN/TURN servers
         async function init() {
             try {
+                logDiagnostic('Initializing PeerJS...', 'info');
+                
                 // Get or create persistent ID
                 myShortId = getOrCreateId();
                 
+                // Configure with multiple STUN/TURN servers for better connectivity
+                const config = {
+                    debug: 2,
+                    config: {
+                        iceServers: [
+                            { urls: 'stun:stun.l.google.com:19302' },
+                            { urls: 'stun:stun1.l.google.com:19302' },
+                            { urls: 'stun:stun2.l.google.com:19302' },
+                            { urls: 'stun:stun3.l.google.com:19302' },
+                            { urls: 'stun:stun4.l.google.com:19302' },
+                            // Free TURN server (limited)
+                            {
+                                urls: 'turn:openrelay.metered.ca:80',
+                                username: 'openrelayproject',
+                                credential: 'openrelayproject'
+                            },
+                            {
+                                urls: 'turn:openrelay.metered.ca:443',
+                                username: 'openrelayproject',
+                                credential: 'openrelayproject'
+                            }
+                        ],
+                        iceTransportPolicy: 'all', // Try all methods
+                        iceCandidatePoolSize: 10
+                    }
+                };
+
                 // Create a new peer with our stored/generated ID
-                peer = new Peer(myShortId, {
-                    debug: 2
-                });
+                peer = new Peer(myShortId, config);
 
                 peer.on('open', (id) => {
                     document.getElementById('myPeerId').textContent = id;
                     document.getElementById('status').textContent = 'Ready! Share your code with the other person.';
+                    logDiagnostic('Peer connection opened successfully', 'success');
                 });
 
                 peer.on('error', (error) => {
                     console.error('Peer error:', error);
+                    logDiagnostic(`Peer error: ${error.type} - ${error.message}`, 'error');
                     
                     // If ID is taken, generate a new one and store it
                     if (error.type === 'unavailable-id') {
@@ -416,7 +487,7 @@
                         const newId = generateShortId();
                         localStorage.setItem(STORAGE_KEY, newId);
                         myShortId = newId;
-                        peer = new Peer(myShortId, { debug: 2 });
+                        peer = new Peer(myShortId, config);
                         // Re-attach event listeners
                         attachPeerListeners();
                     } else {
@@ -428,6 +499,7 @@
 
             } catch (error) {
                 console.error('Initialization error:', error);
+                logDiagnostic(`Initialization error: ${error.message}`, 'error');
                 document.getElementById('status').textContent = 'Error initializing: ' + error.message;
             }
         }
@@ -437,23 +509,41 @@
             peer.on('open', (id) => {
                 document.getElementById('myPeerId').textContent = id;
                 document.getElementById('status').textContent = 'Ready! Share your code with the other person.';
+                logDiagnostic('Ready to receive calls', 'success');
             });
 
             // Handle incoming calls
             peer.on('call', async (call) => {
+                logDiagnostic('Incoming call detected', 'info');
                 document.getElementById('status').textContent = 'Incoming call...';
                 
                 // Get local stream
                 if (!localStream) {
+                    logDiagnostic('Getting local media stream...', 'info');
                     await getLocalStream();
                 }
 
                 // Answer the call with our stream
+                logDiagnostic('Answering call with local stream', 'info');
                 call.answer(localStream);
                 currentCall = call;
 
+                // Monitor connection state
+                if (call.peerConnection) {
+                    call.peerConnection.oniceconnectionstatechange = () => {
+                        logDiagnostic(`ICE connection state: ${call.peerConnection.iceConnectionState}`, 'info');
+                    };
+                    
+                    call.peerConnection.onconnectionstatechange = () => {
+                        logDiagnostic(`Connection state: ${call.peerConnection.connectionState}`, 'info');
+                    };
+                }
+
                 // Handle the remote stream
                 call.on('stream', (remoteStream) => {
+                    logDiagnostic('Remote stream received!', 'success');
+                    logDiagnostic(`Remote stream has ${remoteStream.getVideoTracks().length} video tracks and ${remoteStream.getAudioTracks().length} audio tracks`, 'info');
+                    
                     document.getElementById('remoteVideo').srcObject = remoteStream;
                     document.getElementById('remoteContainer').classList.remove('hidden');
                     document.getElementById('status').textContent = 'Connected!';
@@ -465,19 +555,49 @@
                 });
 
                 call.on('close', () => {
+                    logDiagnostic('Call closed', 'warning');
                     endCall();
                 });
+
+                call.on('error', (error) => {
+                    logDiagnostic(`Call error: ${error.message}`, 'error');
+                });
+            });
+
+            peer.on('disconnected', () => {
+                logDiagnostic('Peer disconnected from server', 'warning');
+            });
+
+            peer.on('close', () => {
+                logDiagnostic('Peer connection closed', 'warning');
             });
         }
 
         // Get local video/audio stream
         async function getLocalStream() {
             try {
+                logDiagnostic('Requesting camera and microphone access...', 'info');
+                
                 localStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: true
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
                 });
+                
+                logDiagnostic(`Local stream obtained: ${localStream.getVideoTracks().length} video, ${localStream.getAudioTracks().length} audio`, 'success');
+                
                 document.getElementById('localVideo').srcObject = localStream;
+                
+                // Log track details
+                localStream.getTracks().forEach(track => {
+                    logDiagnostic(`Track: ${track.kind} - ${track.label} (enabled: ${track.enabled})`, 'info');
+                });
                 
                 // Setup audio visualization for local stream
                 setupAudioVisualization(localStream, 'local');
@@ -485,31 +605,38 @@
                 return localStream;
             } catch (error) {
                 console.error('Error accessing media devices:', error);
-                alert('Could not access camera/microphone. Please grant permissions.');
+                logDiagnostic(`Media access error: ${error.name} - ${error.message}`, 'error');
+                alert('Could not access camera/microphone. Please grant permissions and try again.');
                 throw error;
             }
         }
 
         // Setup audio visualization
         function setupAudioVisualization(stream, type) {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const analyser = audioContext.createAnalyser();
-            const source = audioContext.createMediaStreamSource(stream);
-            
-            analyser.fftSize = 256;
-            source.connect(analyser);
-            
-            if (type === 'local') {
-                localAudioContext = audioContext;
-                localAnalyser = analyser;
-            } else {
-                remoteAudioContext = audioContext;
-                remoteAnalyser = analyser;
-            }
-            
-            // Start visualization
-            if (!animationFrameId) {
-                visualizeAudio();
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const analyser = audioContext.createAnalyser();
+                const source = audioContext.createMediaStreamSource(stream);
+                
+                analyser.fftSize = 256;
+                source.connect(analyser);
+                
+                if (type === 'local') {
+                    localAudioContext = audioContext;
+                    localAnalyser = analyser;
+                    logDiagnostic('Local audio visualization setup', 'success');
+                } else {
+                    remoteAudioContext = audioContext;
+                    remoteAnalyser = analyser;
+                    logDiagnostic('Remote audio visualization setup', 'success');
+                }
+                
+                // Start visualization
+                if (!animationFrameId) {
+                    visualizeAudio();
+                }
+            } catch (error) {
+                logDiagnostic(`Audio visualization error: ${error.message}`, 'error');
             }
         }
 
@@ -583,23 +710,46 @@
                 return;
             }
 
+            logDiagnostic(`Attempting to call ${remotePeerId}`, 'info');
             document.getElementById('status').textContent = 'Connecting...';
 
             try {
                 // Get local stream if we don't have it
                 if (!localStream) {
+                    logDiagnostic('Getting local media stream...', 'info');
                     await getLocalStream();
                 }
 
                 // Make the call
+                logDiagnostic('Initiating call...', 'info');
                 currentCall = peer.call(remotePeerId, localStream);
 
                 if (!currentCall) {
                     throw new Error('Failed to initiate call');
                 }
 
+                logDiagnostic('Call initiated, waiting for response...', 'info');
+
+                // Monitor connection state
+                if (currentCall.peerConnection) {
+                    currentCall.peerConnection.oniceconnectionstatechange = () => {
+                        logDiagnostic(`ICE connection state: ${currentCall.peerConnection.iceConnectionState}`, 'info');
+                    };
+                    
+                    currentCall.peerConnection.onconnectionstatechange = () => {
+                        logDiagnostic(`Connection state: ${currentCall.peerConnection.connectionState}`, 'info');
+                    };
+
+                    currentCall.peerConnection.onicegatheringstatechange = () => {
+                        logDiagnostic(`ICE gathering state: ${currentCall.peerConnection.iceGatheringState}`, 'info');
+                    };
+                }
+
                 // Handle the remote stream
                 currentCall.on('stream', (remoteStream) => {
+                    logDiagnostic('Remote stream received!', 'success');
+                    logDiagnostic(`Remote stream has ${remoteStream.getVideoTracks().length} video tracks and ${remoteStream.getAudioTracks().length} audio tracks`, 'info');
+                    
                     document.getElementById('remoteVideo').srcObject = remoteStream;
                     document.getElementById('remoteContainer').classList.remove('hidden');
                     document.getElementById('status').textContent = 'Connected!';
@@ -611,29 +761,37 @@
                 });
 
                 currentCall.on('close', () => {
+                    logDiagnostic('Call closed by remote peer', 'warning');
                     endCall();
                 });
 
                 currentCall.on('error', (error) => {
                     console.error('Call error:', error);
+                    logDiagnostic(`Call error: ${error.type} - ${error.message}`, 'error');
                     document.getElementById('status').textContent = 'Call failed: ' + error.message;
                     endCall();
                 });
 
             } catch (error) {
                 console.error('Error starting call:', error);
+                logDiagnostic(`Failed to start call: ${error.message}`, 'error');
                 document.getElementById('status').textContent = 'Failed to start call: ' + error.message;
             }
         }
 
         // End the current call
         function endCall() {
+            logDiagnostic('Ending call...', 'info');
+            
             if (currentCall) {
                 currentCall.close();
             }
 
             if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
+                localStream.getTracks().forEach(track => {
+                    track.stop();
+                    logDiagnostic(`Stopped ${track.kind} track`, 'info');
+                });
                 localStream = null;
             }
 
@@ -668,6 +826,8 @@
             updateButtonStatus();
             
             currentCall = null;
+            
+            logDiagnostic('Call ended, ready for new call', 'success');
         }
 
         // Toggle video on/off
@@ -678,6 +838,7 @@
                     track.enabled = isVideoEnabled;
                 });
                 updateButtonStatus();
+                logDiagnostic(`Video ${isVideoEnabled ? 'enabled' : 'disabled'}`, 'info');
             }
         }
 
@@ -689,6 +850,7 @@
                     track.enabled = isAudioEnabled;
                 });
                 updateButtonStatus();
+                logDiagnostic(`Audio ${isAudioEnabled ? 'enabled' : 'disabled'}`, 'info');
                 
                 // Clear bars when audio is disabled
                 if (!isAudioEnabled) {
