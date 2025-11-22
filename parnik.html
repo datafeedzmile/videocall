@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Draggable House — nudged labels</title>
+<style>
+  html,body{height:100%;margin:0;background:#111827;color:#e5e7eb;font-family:system-ui,Segoe UI,Roboto,Arial}
+  .wrap{padding:14px}
+  #controls{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+  button{padding:6px 10px;border-radius:6px;border:0;background:#2563eb;color:#fff;cursor:pointer}
+  canvas{display:block;border-radius:8px;background:#020617;box-shadow:0 0 0 1px #1f2937;max-width:100%;height:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="controls">
+    <div>Drag points. EC connected and measured. Angles shown inside (nudged). A/B labels moved outside.</div>
+    <button id="reset">Reset</button>
+  </div>
+  <canvas id="canvas" width="1200" height="700"></canvas>
+</div>
+
+<script>
+/* Configuration */
+const METERS_TO_PX = 60;     // 1 m = 60 px
+const BOTTOM_M = 10;
+const WALL_H_M = 3;
+const groundY_px = 560;
+const hitR_px = 14;
+const scale = METERS_TO_PX;
+const bottomPx = BOTTOM_M * scale;
+const minWallY = groundY_px - WALL_H_M * scale;
+const names = ['A','B','C','D','E'];
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+function defaultVerts(){
+  const leftX = 120;
+  return [
+    { x: leftX,                 y: groundY_px },                 // A
+    { x: leftX + bottomPx,      y: groundY_px },                 // B
+    { x: leftX + bottomPx,      y: minWallY },                   // C
+    { x: leftX + bottomPx/2,    y: groundY_px - 6*scale },       // D
+    { x: leftX,                 y: minWallY }                    // E
+  ];
+}
+
+let verts = defaultVerts();
+let dragging = -1;
+
+/* Math helpers */
+function vec(a,b){ return {x: b.x - a.x, y: b.y - a.y}; }
+function len(v){ return Math.hypot(v.x, v.y); }
+function normalize(v){ const L = len(v)||1; return {x: v.x/L, y: v.y/L}; }
+function add(u,v){ return {x: u.x+v.x, y: u.y+v.y}; }
+function dot(u,v){ return u.x*v.x + u.y*v.y; }
+function angleDeg(u,v){
+  const lu = len(u), lv = len(v);
+  if(lu === 0 || lv === 0) return 0;
+  let c = dot(u,v)/(lu*lv);
+  c = Math.max(-1, Math.min(1, c));
+  return Math.acos(c) * 180/Math.PI;
+}
+function distance(a,b){ return Math.hypot(a.x-b.x, a.y-b.y); }
+function sideLengthsMeters(v){
+  const out = [];
+  for(let i=0;i<v.length;i++) out.push(distance(v[i], v[(i+1)%v.length]) / scale);
+  return out;
+}
+
+/* Pointer mapping (handles CSS scaling) */
+function getCanvasPoint(evt){
+  const rect = canvas.getBoundingClientRect();
+  const t = evt.touches ? evt.touches[0] : evt;
+  const x = (t.clientX - rect.left) * (canvas.width / rect.width);
+  const y = (t.clientY - rect.top) * (canvas.height / rect.height);
+  return { x, y };
+}
+
+/* Drawing */
+function drawGrid(){
+  ctx.save();
+  ctx.strokeStyle = '#15202b44';
+  ctx.lineWidth = 1;
+  for(let x = scale; x < canvas.width; x += scale){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
+  for(let y = scale; y < canvas.height; y += scale){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+  ctx.restore();
+}
+
+function interiorBisector(curIdx){
+  const prev = verts[(curIdx-1+verts.length)%verts.length];
+  const cur = verts[curIdx];
+  const next = verts[(curIdx+1)%verts.length];
+  const u = normalize(vec(cur, prev)); // toward prev
+  const w = normalize(vec(cur, next)); // toward next
+  const s = add(u, w);
+  // if u and w are opposite, s is near zero: fallback to normal
+  if(len(s) < 0.001){
+    // pick perpendicular to edge prev->next
+    const edge = vec(prev, next);
+    return normalize({x: -edge.y, y: edge.x});
+  }
+  return normalize(s); // points roughly inside
+}
+
+function render(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawGrid();
+
+  const lens = sideLengthsMeters(verts);
+
+  // ground
+  ctx.save(); ctx.strokeStyle = '#374151'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0,groundY_px); ctx.lineTo(canvas.width, groundY_px); ctx.stroke(); ctx.restore();
+
+  // polygon
+  ctx.save(); ctx.lineWidth = 3; ctx.strokeStyle = '#60a5fa'; ctx.fillStyle = 'rgba(37,99,235,0.08)';
+  ctx.beginPath(); ctx.moveTo(verts[0].x, verts[0].y);
+  for(let i=1;i<verts.length;i++) ctx.lineTo(verts[i].x, verts[i].y);
+  ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+
+  // EC connecting line + label
+  const C = verts[2], E = verts[4];
+  ctx.save();
+  ctx.lineWidth = 2; ctx.setLineDash([6,4]); ctx.strokeStyle = '#f59e0b';
+  ctx.beginPath(); ctx.moveTo(E.x, E.y); ctx.lineTo(C.x, C.y); ctx.stroke();
+  ctx.setLineDash([]);
+  const midEC = { x: (E.x + C.x)/2, y: (E.y + C.y)/2 };
+  const ecLenM = distance(E,C) / scale;
+  const dx = C.x - E.x, dy = C.y - E.y, L = Math.hypot(dx,dy)||1;
+  const nx = -dy/L, ny = dx/L;
+  ctx.font = '14px system-ui'; ctx.fillStyle = '#f59e0b'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(ecLenM.toFixed(2) + ' m', midEC.x + nx*28, midEC.y + ny*28); // moved farther out (28)
+  ctx.restore();
+
+  // D vertical height (label left of D)
+  const D = verts[3];
+  ctx.save();
+  ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(D.x, D.y); ctx.lineTo(D.x, groundY_px); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(D.x - 8, groundY_px); ctx.lineTo(D.x + 8, groundY_px); ctx.stroke();
+  const heightM = (groundY_px - D.y) / scale;
+  ctx.fillStyle = '#ef4444'; ctx.font = '14px system-ui'; ctx.textAlign='right'; ctx.textBaseline='middle';
+  ctx.fillText(heightM.toFixed(2) + ' m', D.x - 12, D.y); // slightly more left
+  ctx.restore();
+
+  // polygon side length labels — moved further out (offset 22 -> 28)
+  ctx.save(); ctx.font = '13px system-ui'; ctx.fillStyle = '#f9fafb'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  for(let i=0;i<verts.length;i++){
+    const a = verts[i], b = verts[(i+1)%verts.length];
+    const mx = (a.x + b.x)/2, my = (a.y + b.y)/2;
+    const vx = b.x - a.x, vy = b.y - a.y; const LL = Math.hypot(vx,vy)||1;
+    const nx2 = -vy/LL, ny2 = vx/LL;
+    ctx.fillText(lens[i].toFixed(2) + ' m', mx + nx2*28, my + ny2*28);
+  }
+  ctx.restore();
+
+  // draw vertices
+  for(let i=0;i<verts.length;i++){
+    const v = verts[i];
+    ctx.beginPath(); ctx.fillStyle = '#ffffff'; ctx.arc(v.x, v.y, 7, 0, Math.PI*2); ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = '#1d4ed8'; ctx.stroke();
+  }
+
+  // NAME LABELS: move A and B outside (use negative bisector * offset)
+  ctx.save();
+  ctx.fillStyle = '#bfdbfe'; ctx.font = '13px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  for(let i=0;i<verts.length;i++){
+    const v = verts[i];
+    if(i === 0 || i === 1){
+      // place name outside: negative interior bisector
+      const bis = interiorBisector(i);
+      ctx.fillText(names[i], v.x - bis.x*28, v.y - bis.y*28);
+    } else {
+      // other names slightly above the point
+      ctx.fillText(names[i], v.x, v.y - 12);
+    }
+  }
+  ctx.restore();
+
+  // ANGLES (all placed inside, nudged farther from corners)
+  ctx.save(); ctx.fillStyle = '#f97316'; ctx.font='12px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  // A and B interior angles — place along interior bisector further in (offset 28)
+  [0,1].forEach(i=>{
+    const prev = verts[(i-1+verts.length)%verts.length], cur = verts[i], next = verts[(i+1)%verts.length];
+    const ang = angleDeg(vec(cur, prev), vec(cur, next));
+    const bis = interiorBisector(i);
+    // interior bisector points inside; move further in (offset 28)
+    ctx.fillText(ang.toFixed(1) + '°', cur.x + bis.x*28, cur.y + bis.y*28);
+  });
+
+  // C split angles — place inside farther (offset 30)
+  (function(){
+    const idx = 2; const cur = verts[idx];
+    const toB = vec(cur, verts[1]); // C->B
+    const toE = vec(cur, verts[4]); // C->E
+    const toD = vec(cur, verts[3]); // C->D
+    const a1 = angleDeg(toB, toE);
+    const a2 = angleDeg(toE, toD);
+    const dir1 = normalize(add(normalize(toB), normalize(toE)));
+    const dir2 = normalize(add(normalize(toE), normalize(toD)));
+    ctx.fillText(a1.toFixed(1)+'°', cur.x + dir1.x*30, cur.y + dir1.y*30);
+    ctx.fillText(a2.toFixed(1)+'°', cur.x + dir2.x*30, cur.y + dir2.y*30);
+  })();
+
+  // E split angles — place inside farther (offset 30)
+  (function(){
+    const idx = 4; const cur = verts[idx];
+    const toD = vec(cur, verts[3]); const toC = vec(cur, verts[2]); const toA = vec(cur, verts[0]);
+    const b1 = angleDeg(toD, toC); const b2 = angleDeg(toC, toA);
+    const dir1 = normalize(add(normalize(toD), normalize(toC)));
+    const dir2 = normalize(add(normalize(toC), normalize(toA)));
+    ctx.fillText(b1.toFixed(1)+'°', cur.x + dir1.x*30, cur.y + dir1.y*30);
+    ctx.fillText(b2.toFixed(1)+'°', cur.x + dir2.x*30, cur.y + dir2.y*30);
+  })();
+
+  // D split angles (split by vertical) — place inside, offset 30
+  (function(){
+    const idx = 3; const cur = verts[idx];
+    const toC = vec(cur, verts[2]); const toE = vec(cur, verts[4]);
+    const toV = { x: 0, y: groundY_px - cur.y }; // vertical down
+    const a1 = angleDeg(toC, toV);
+    const a2 = angleDeg(toV, toE);
+    const dir1 = normalize(add(normalize(toC), normalize(toV)));
+    const dir2 = normalize(add(normalize(toV), normalize(toE)));
+    ctx.fillText(a1.toFixed(1)+'°', cur.x + dir1.x*30, cur.y + dir1.y*30);
+    ctx.fillText(a2.toFixed(1)+'°', cur.x + dir2.x*30, cur.y + dir2.y*30);
+  })();
+
+  ctx.restore();
+}
+
+/* Interaction */
+function pointerDown(evt){
+  evt.preventDefault();
+  const p = getCanvasPoint(evt);
+  dragging = -1;
+  for(let i=0;i<verts.length;i++) if(distance(p, verts[i]) <= hitR_px){ dragging = i; break; }
+}
+function pointerMove(evt){
+  if(dragging === -1) return;
+  evt.preventDefault();
+  const p = getCanvasPoint(evt);
+  verts[dragging].x = p.x;
+  verts[dragging].y = p.y;
+  // keep bottom A/B from going below ground
+  if(dragging === 0 || dragging === 1) if(verts[dragging].y > groundY_px) verts[dragging].y = groundY_px;
+  render();
+}
+function pointerUp(){ dragging = -1; }
+
+/* Events */
+canvas.addEventListener('mousedown', pointerDown);
+window.addEventListener('mousemove', pointerMove);
+window.addEventListener('mouseup', pointerUp);
+canvas.addEventListener('touchstart', pointerDown, { passive:false });
+window.addEventListener('touchmove', pointerMove, { passive:false });
+window.addEventListener('touchend', pointerUp, { passive:false });
+window.addEventListener('touchcancel', pointerUp, { passive:false });
+
+/* Reset */
+document.getElementById('reset').addEventListener('click', ()=>{ verts = defaultVerts(); render(); });
+
+/* initial draw */
+render();
+</script>
+</body>
+</html>
