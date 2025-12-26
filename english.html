@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Learning Tool - 100 Essential Words</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            font-size: 13px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin: 20px 0;
+            font-size: 24px;
+        }
+        
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            vertical-align: top;
+            font-size: 13px;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        button:hover {
+            background-color: #0b7dda;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        
+        /* Word grouping */
+        .word-group {
+            border-bottom: 3px solid #333;
+        }
+        .pos-group {
+            border-bottom: 1px dotted #999;
+        }
+        
+        /* Part of speech label */
+        .pos-label {
+            display: inline-block;
+            background-color: #FF9800;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-right: 8px;
+            text-transform: uppercase;
+        }
+        
+        .meaning-label {
+            font-weight: bold;
+            color: #2196F3;
+            font-size: 11px;
+            display: inline-block;
+            min-width: 20px;
+        }
+        .examples {
+            font-style: italic;
+            color: #666;
+            margin-top: 2px;
+            font-size: 12px;
+        }
+        .explanation {
+            margin-bottom: 2px;
+            line-height: 1.3;
+        }
+        
+        /* Mobile/iPad optimization */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 20px;
+            }
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>100 Most Essential English Words</h1>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 70px;">Audio</th>
+                    <th style="width: 70px;">English</th>
+                    <th>Part of Speech, Explanation & Examples</th>
+                    <th style="width: 150px;">Uzbek</th>
+                    <th style="width: 150px;">Russian</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- WORD 1: BE -->
+                <tr class="pos-group">
+                    <td rowspan="2"><button onclick="speak('be')">▶ Play</button></td>
+                    <td rowspan="2"><strong>be</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">1:</span> <span class="explanation">To exist.</span>
+                        <div class="examples">I am here. • You are good. • He is happy.</div>
+                    </td>
+                    <td><span class="meaning-label">1:</span> mavjud bo'lmoq</td>
+                    <td><span class="meaning-label">1:</span> существовать</td>
+                </tr>
+                <tr class="pos-group word-group">
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">2:</span> <span class="explanation">To have a quality.</span>
+                        <div class="examples">I am tired. • She is tall. • We are ready.</div>
+                    </td>
+                    <td><span class="meaning-label">2:</span> bo'lmoq</td>
+                    <td><span class="meaning-label">2:</span> быть</td>
+                </tr>
+
+                <!-- WORD 2: HAVE -->
+                <tr class="pos-group">
+                    <td rowspan="2"><button onclick="speak('have')">▶ Play</button></td>
+                    <td rowspan="2"><strong>have</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">1:</span> <span class="explanation">To own something.</span>
+                        <div class="examples">I have a car. • She has a dog. • We have time.</div>
+                    </td>
+                    <td><span class="meaning-label">1:</span> ega bo'lmoq</td>
+                    <td><span class="meaning-label">1:</span> иметь</td>
+                </tr>
+                <tr class="pos-group word-group">
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">2:</span> <span class="explanation">To eat or drink.</span>
+                        <div class="examples">Have breakfast. • Have some water. • Let's have lunch.</div>
+                    </td>
+                    <td><span class="meaning-label">2:</span> ichmoq/yemoq</td>
+                    <td><span class="meaning-label">2:</span> есть/пить</td>
+                </tr>
+
+                <!-- WORD 3: DO -->
+                <tr class="pos-group">
+                    <td rowspan="2"><button onclick="speak('do')">▶ Play</button></td>
+                    <td rowspan="2"><strong>do</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">1:</span> <span class="explanation">To perform an action.</span>
+                        <div class="examples">Do your work. • I do my job. • Let's do it.</div>
+                    </td>
+                    <td><span class="meaning-label">1:</span> qilmoq</td>
+                    <td><span class="meaning-label">1:</span> делать</td>
+                </tr>
+                <tr class="pos-group word-group">
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">2:</span> <span class="explanation">Helper verb for questions.</span>
+                        <div class="examples">Do you like it? • I don't know. • Does he work?</div>
+                    </td>
+                    <td><span class="meaning-label">2:</span> yordamchi fe'l</td>
+                    <td><span class="meaning-label">2:</span> вспомог. глагол</td>
+                </tr>
+
+                <!-- WORD 4: SAY -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('say')">▶ Play</button></td>
+                    <td><strong>say</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To speak words.</span>
+                        <div class="examples">Say hello. • What did you say? • She says yes.</div>
+                    </td>
+                    <td>aytmoq</td>
+                    <td>говорить</td>
+                </tr>
+
+                <!-- WORD 5: GET -->
+                <tr class="pos-group">
+                    <td rowspan="3"><button onclick="speak('get')">▶ Play</button></td>
+                    <td rowspan="3"><strong>get</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">1:</span> <span class="explanation">To receive.</span>
+                        <div class="examples">Get a gift. • I got it. • Get some food.</div>
+                    </td>
+                    <td><span class="meaning-label">1:</span> olmoq</td>
+                    <td><span class="meaning-label">1:</span> получать</td>
+                </tr>
+                <tr class="pos-group">
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">2:</span> <span class="explanation">To become.</span>
+                        <div class="examples">Get cold. • I'm getting tired. • It gets dark.</div>
+                    </td>
+                    <td><span class="meaning-label">2:</span> bo'lib qolmoq</td>
+                    <td><span class="meaning-label">2:</span> становиться</td>
+                </tr>
+                <tr class="pos-group word-group">
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">3:</span> <span class="explanation">To understand.</span>
+                        <div class="examples">I get it. • Do you get me? • She gets the idea.</div>
+                    </td>
+                    <td><span class="meaning-label">3:</span> tushunmoq</td>
+                    <td><span class="meaning-label">3:</span> понимать</td>
+                </tr>
+
+                <!-- WORD 6: MAKE -->
+                <tr class="pos-group">
+                    <td rowspan="2"><button onclick="speak('make')">▶ Play</button></td>
+                    <td rowspan="2"><strong>make</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">1:</span> <span class="explanation">To create.</span>
+                        <div class="examples">Make food. • I make coffee. • Make a plan.</div>
+                    </td>
+                    <td><span class="meaning-label">1:</span> yasmoq</td>
+                    <td><span class="meaning-label">1:</span> делать</td>
+                </tr>
+                <tr class="pos-group word-group">
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">2:</span> <span class="explanation">To cause.</span>
+                        <div class="examples">You make me happy. • It makes noise. • That makes sense.</div>
+                    </td>
+                    <td><span class="meaning-label">2:</span> sabab bo'lmoq</td>
+                    <td><span class="meaning-label">2:</span> вызывать</td>
+                </tr>
+
+                <!-- WORD 7: GO -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('go')">▶ Play</button></td>
+                    <td><strong>go</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To move to a place.</span>
+                        <div class="examples">Go home. • I go to school. • Let's go.</div>
+                    </td>
+                    <td>bormoq</td>
+                    <td>идти</td>
+                </tr>
+
+                <!-- WORD 8: KNOW -->
+                <tr class="pos-group">
+                    <td rowspan="2"><button onclick="speak('know')">▶ Play</button></td>
+                    <td rowspan="2"><strong>know</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">1:</span> <span class="explanation">To have information.</span>
+                        <div class="examples">I know it. • Do you know him? • She knows a lot.</div>
+                    </td>
+                    <td><span class="meaning-label">1:</span> bilmoq</td>
+                    <td><span class="meaning-label">1:</span> знать</td>
+                </tr>
+                <tr class="pos-group word-group">
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">2:</span> <span class="explanation">To understand.</span>
+                        <div class="examples">I know how you feel. • You know what I mean. • Now I know.</div>
+                    </td>
+                    <td><span class="meaning-label">2:</span> tushunmoq</td>
+                    <td><span class="meaning-label">2:</span> понимать</td>
+                </tr>
+
+                <!-- WORD 9: TAKE -->
+                <tr class="pos-group">
+                    <td rowspan="2"><button onclick="speak('take')">▶ Play</button></td>
+                    <td rowspan="2"><strong>take</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">1:</span> <span class="explanation">To grab or hold.</span>
+                        <div class="examples">Take this. • I take the bus. • Take my hand.</div>
+                    </td>
+                    <td><span class="meaning-label">1:</span> olmoq</td>
+                    <td><span class="meaning-label">1:</span> брать</td>
+                </tr>
+                <tr class="pos-group word-group">
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">2:</span> <span class="explanation">To need time.</span>
+                        <div class="examples">It takes 2 hours. • Take your time. • How long does it take?</div>
+                    </td>
+                    <td><span class="meaning-label">2:</span> vaqt talab qilmoq</td>
+                    <td><span class="meaning-label">2:</span> занимать время</td>
+                </tr>
+
+                <!-- WORD 10: SEE -->
+                <tr class="pos-group">
+                    <td rowspan="2"><button onclick="speak('see')">▶ Play</button></td>
+                    <td rowspan="2"><strong>see</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">1:</span> <span class="explanation">To look at with eyes.</span>
+                        <div class="examples">I see you. • See the bird. • Can you see it?</div>
+                    </td>
+                    <td><span class="meaning-label">1:</span> ko'rmoq</td>
+                    <td><span class="meaning-label">1:</span> видеть</td>
+                </tr>
+                <tr class="pos-group word-group">
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">2:</span> <span class="explanation">To meet someone.</span>
+                        <div class="examples">See you later. • I see my friends. • See the doctor.</div>
+                    </td>
+                    <td><span class="meaning-label">2:</span> uchrashmoq</td>
+                    <td><span class="meaning-label">2:</span> встречаться</td>
+                </tr>
+
+                <!-- WORD 11: COME -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('come')">▶ Play</button></td>
+                    <td><strong>come</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To move here.</span>
+                        <div class="examples">Come here. • She is coming. • Come with me.</div>
+                    </td>
+                    <td>kelmoq</td>
+                    <td>приходить</td>
+                </tr>
+
+                <!-- WORD 12: THINK -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('think')">▶ Play</button></td>
+                    <td><strong>think</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To use your mind.</span>
+                        <div class="examples">I think so. • Think about it. • What do you think?</div>
+                    </td>
+                    <td>o'ylamoq</td>
+                    <td>думать</td>
+                </tr>
+
+                <!-- WORD 13: LOOK -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('look')">▶ Play</button></td>
+                    <td><strong>look</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To turn your eyes to see.</span>
+                        <div class="examples">Look at me. • Look here. • She looks happy.</div>
+                    </td>
+                    <td>qaramoq</td>
+                    <td>смотреть</td>
+                </tr>
+
+                <!-- WORD 14: WANT -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('want')">▶ Play</button></td>
+                    <td><strong>want</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To wish for something.</span>
+                        <div class="examples">I want food. • What do you want? • She wants to go.</div>
+                    </td>
+                    <td>xohlamoq</td>
+                    <td>хотеть</td>
+                </tr>
+
+                <!-- WORD 15: GIVE -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('give')">▶ Play</button></td>
+                    <td><strong>give</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To hand something to someone.</span>
+                        <div class="examples">Give me that. • I give you a gift. • Give it to her.</div>
+                    </td>
+                    <td>bermoq</td>
+                    <td>давать</td>
+                </tr>
+
+                <!-- WORD 16: USE -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('use')">▶ Play</button></td>
+                    <td><strong>use</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To employ for a purpose.</span>
+                        <div class="examples">Use this pen. • I use my phone. • How do you use it?</div>
+                    </td>
+                    <td>ishlatmoq</td>
+                    <td>использовать</td>
+                </tr>
+
+                <!-- WORD 17: FIND -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('find')">▶ Play</button></td>
+                    <td><strong>find</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To discover something.</span>
+                        <div class="examples">Find your keys. • I found it. • Can you find it?</div>
+                    </td>
+                    <td>topmoq</td>
+                    <td>находить</td>
+                </tr>
+
+                <!-- WORD 18: TELL -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('tell')">▶ Play</button></td>
+                    <td><strong>tell</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To give information.</span>
+                        <div class="examples">Tell me. • I told you. • She tells stories.</div>
+                    </td>
+                    <td>aytmoq</td>
+                    <td>рассказывать</td>
+                </tr>
+
+                <!-- WORD 19: ASK -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('ask')">▶ Play</button></td>
+                    <td><strong>ask</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To request information.</span>
+                        <div class="examples">Ask a question. • I ask him. • Ask for help.</div>
+                    </td>
+                    <td>so'ramoq</td>
+                    <td>спрашивать</td>
+                </tr>
+
+                <!-- WORD 20: WORK -->
+                <tr class="pos-group">
+                    <td rowspan="2"><button onclick="speak('work')">▶ Play</button></td>
+                    <td rowspan="2"><strong>work</strong></td>
+                    <td>
+                        <span class="pos-label">Noun</span>
+                        <span class="meaning-label">1:</span> <span class="explanation">A job.</span>
+                        <div class="examples">I go to work. • Hard work. • No work today.</div>
+                    </td>
+                    <td><span class="meaning-label">1:</span> ish</td>
+                    <td><span class="meaning-label">1:</span> работа</td>
+                </tr>
+                <tr class="pos-group word-group">
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">2:</span> <span class="explanation">To do a job.</span>
+                        <div class="examples">I work here. • It works. • She works hard.</div>
+                    </td>
+                    <td><span class="meaning-label">2:</span> ishlamoq</td>
+                    <td><span class="meaning-label">2:</span> работать</td>
+                </tr>
+
+                <!-- WORD 21: FEEL -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('feel')">▶ Play</button></td>
+                    <td><strong>feel</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To experience emotion.</span>
+                        <div class="examples">I feel good. • Feel this. • How do you feel?</div>
+                    </td>
+                    <td>his qilmoq</td>
+                    <td>чувствовать</td>
+                </tr>
+
+                <!-- WORD 22: TRY -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('try')">▶ Play</button></td>
+                    <td><strong>try</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To attempt.</span>
+                        <div class="examples">Try again. • I'll try. • Try this food.</div>
+                    </td>
+                    <td>harakat qilmoq</td>
+                    <td>пытаться</td>
+                </tr>
+
+                <!-- WORD 23: LEAVE -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('leave')">▶ Play</button></td>
+                    <td><strong>leave</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To go away.</span>
+                        <div class="examples">I'm leaving. • Leave me alone. • She left early.</div>
+                    </td>
+                    <td>ketmoq</td>
+                    <td>уходить</td>
+                </tr>
+
+                <!-- WORD 24: CALL -->
+                <tr class="pos-group">
+                    <td rowspan="2"><button onclick="speak('call')">▶ Play</button></td>
+                    <td rowspan="2"><strong>call</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">1:</span> <span class="explanation">To phone.</span>
+                        <div class="examples">Call me. • I'll call you. • Call the police.</div>
+                    </td>
+                    <td><span class="meaning-label">1:</span> qo'ng'iroq qilmoq</td>
+                    <td><span class="meaning-label">1:</span> звонить</td>
+                </tr>
+                <tr class="pos-group word-group">
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="meaning-label">2:</span> <span class="explanation">To name.</span>
+                        <div class="examples">Call me Tom. • What's it called? • They call him Jim.</div>
+                    </td>
+                    <td><span class="meaning-label">2:</span> atamoq</td>
+                    <td><span class="meaning-label">2:</span> называть</td>
+                </tr>
+
+                <!-- WORD 25: KEEP -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('keep')">▶ Play</button></td>
+                    <td><strong>keep</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To have or hold.</span>
+                        <div class="examples">Keep it. • Keep going. • Keep quiet.</div>
+                    </td>
+                    <td>saqlash</td>
+                    <td>держать</td>
+                </tr>
+
+                <!-- WORD 26: LET -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('let')">▶ Play</button></td>
+                    <td><strong>let</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To allow.</span>
+                        <div class="examples">Let me go. • Let's do it. • Let him play.</div>
+                    </td>
+                    <td>ruxsat bermoq</td>
+                    <td>позволять</td>
+                </tr>
+
+                <!-- WORD 27: PUT -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('put')">▶ Play</button></td>
+                    <td><strong>put</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To place.</span>
+                        <div class="examples">Put it here. • Put on your shoes. • Put the book down.</div>
+                    </td>
+                    <td>qo'ymoq</td>
+                    <td>класть</td>
+                </tr>
+
+                <!-- WORD 28: MEAN -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('mean')">▶ Play</button></td>
+                    <td><strong>mean</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To signify.</span>
+                        <div class="examples">What does it mean? • I mean it. • You know what I mean.</div>
+                    </td>
+                    <td>anglatmoq</td>
+                    <td>означать</td>
+                </tr>
+
+                <!-- WORD 29: BECOME -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('become')">▶ Play</button></td>
+                    <td><strong>become</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To grow into.</span>
+                        <div class="examples">Become a doctor. • It became dark. • She became famous.</div>
+                    </td>
+                    <td>bo'lmoq</td>
+                    <td>становиться</td>
+                </tr>
+
+                <!-- WORD 30: SHOW -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('show')">▶ Play</button></td>
+                    <td><strong>show</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To display.</span>
+                        <div class="examples">Show me. • I'll show you. • Show your work.</div>
+                    </td>
+                    <td>ko'rsatmoq</td>
+                    <td>показывать</td>
+                </tr>
+
+                <!-- WORD 31: NEED -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('need')">▶ Play</button></td>
+                    <td><strong>need</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To require.</span>
+                        <div class="examples">I need help. • You need rest. • We need food.</div>
+                    </td>
+                    <td>kerak bo'lmoq</td>
+                    <td>нуждаться</td>
+                </tr>
+
+                <!-- WORD 32: MOVE -->
+                <tr class="pos-group word-group">
+                    <td><button onclick="speak('move')">▶ Play</button></td>
+                    <td><strong>move</strong></td>
+                    <td>
+                        <span class="pos-label">Verb</span>
+                        <span class="explanation">To change position.</span>
+                        <div class="examples">Don't move. • Move here. • I'm moving to a new house.</div>
+</td>
+                <td>harakatlanmoq</td>
+                <td>двигаться</td>
+            </tr>
+
+            <!-- WORD 33: LIVE -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('live')">▶ Play</button></td>
+                <td><strong>live</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To reside.</span>
+                    <div class="examples">I live here. • Where do you live? • Live your life.</div>
+                </td>
+                <td>yashmoq</td>
+                <td>жить</td>
+            </tr>
+
+            <!-- WORD 34: BELIEVE -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('believe')">▶ Play</button></td>
+                <td><strong>believe</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To accept as true.</span>
+                    <div class="examples">I believe you. • Believe in yourself. • I believe it.</div>
+                </td>
+                <td>ishonmoq</td>
+                <td>верить</td>
+            </tr>
+
+            <!-- WORD 35: BRING -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('bring')">▶ Play</button></td>
+                <td><strong>bring</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To carry to here.</span>
+                    <div class="examples">Bring it here. • She brought food. • Bring your friend.</div>
+                </td>
+                <td>olib kelmoq</td>
+                <td>приносить</td>
+            </tr>
+
+            <!-- WORD 36: HAPPEN -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('happen')">▶ Play</button></td>
+                <td><strong>happen</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To occur.</span>
+                    <div class="examples">What happened? • It just happened. • Things happen.</div>
+                </td>
+                <td>sodir bo'lmoq</td>
+                <td>происходить</td>
+            </tr>
+
+            <!-- WORD 37: WRITE -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('write')">▶ Play</button></td>
+                <td><strong>write</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To form letters.</span>
+                    <div class="examples">Write your name. • I wrote a letter. • Write it down.</div>
+                </td>
+                <td>yozmoq</td>
+                <td>писать</td>
+            </tr>
+
+            <!-- WORD 38: SIT -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('sit')">▶ Play</button></td>
+                <td><strong>sit</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To be seated.</span>
+                    <div class="examples">Sit down. • I'm sitting. • Sit here.</div>
+                </td>
+                <td>o'tirmoq</td>
+                <td>сидеть</td>
+            </tr>
+
+            <!-- WORD 39: STAND -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('stand')">▶ Play</button></td>
+                <td><strong>stand</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To be on your feet.</span>
+                    <div class="examples">Stand up. • I'm standing. • Stand still.</div>
+                </td>
+                <td>turmoq</td>
+                <td>стоять</td>
+            </tr>
+
+            <!-- WORD 40: LOSE -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('lose')">▶ Play</button></td>
+                <td><strong>lose</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To not have anymore.</span>
+                    <div class="examples">Don't lose it. • I lost my keys. • We lost the game.</div>
+                </td>
+                <td>yo'qotmoq</td>
+                <td>терять</td>
+            </tr>
+
+            <!-- WORD 41: PAY -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('pay')">▶ Play</button></td>
+                <td><strong>pay</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To give money.</span>
+                    <div class="examples">Pay me. • I'll pay. • Pay the bill.</div>
+                </td>
+                <td>to'lamoq</td>
+                <td>платить</td>
+            </tr>
+
+            <!-- WORD 42: MEET -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('meet')">▶ Play</button></td>
+                <td><strong>meet</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To see someone.</span>
+                    <div class="examples">Nice to meet you. • Let's meet. • Meet my friend.</div>
+                </td>
+                <td>uchrashmoq</td>
+                <td>встречать</td>
+            </tr>
+
+            <!-- WORD 43: RUN -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('run')">▶ Play</button></td>
+                <td><strong>run</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To move fast.</span>
+                    <div class="examples">Run fast. • I'm running. • Run to school.</div>
+                </td>
+                <td>yugurmoq</td>
+                <td>бегать</td>
+            </tr>
+
+            <!-- WORD 44: HEAR -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('hear')">▶ Play</button></td>
+                <td><strong>hear</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To receive sound.</span>
+                    <div class="examples">I hear you. • Did you hear that? • Can you hear me?</div>
+                </td>
+                <td>eshitmoq</td>
+                <td>слышать</td>
+            </tr>
+
+            <!-- WORD 45: PLAY -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('play')">▶ Play</button></td>
+                <td><strong>play</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To have fun.</span>
+                    <div class="examples">Let's play. • Play a game. • He plays soccer.</div>
+                </td>
+                <td>o'ynamoq</td>
+                <td>играть</td>
+            </tr>
+
+            <!-- WORD 46: TURN -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('turn')">▶ Play</button></td>
+                <td><strong>turn</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To rotate.</span>
+                    <div class="examples">Turn left. • My turn. • Turn it on.</div>
+                </td>
+                <td>burmoq</td>
+                <td>поворачивать</td>
+            </tr>
+
+            <!-- WORD 47: READ -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('read')">▶ Play</button></td>
+                <td><strong>read</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To look at text.</span>
+                    <div class="examples">Read this. • I'm reading. • Read a book.</div>
+                </td>
+                <td>o'qimoq</td>
+                <td>читать</td>
+            </tr>
+
+            <!-- WORD 48: CHANGE -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('change')">▶ Play</button></td>
+                <td><strong>change</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To make different.</span>
+                    <div class="examples">Change clothes. • Things change. • Change your mind.</div>
+                </td>
+                <td>o'zgartirmoq</td>
+                <td>менять</td>
+            </tr>
+
+            <!-- WORD 49: FOLLOW -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('follow')">▶ Play</button></td>
+                <td><strong>follow</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To go after.</span>
+                    <div class="examples">Follow me. • I don't follow. • Follow the rules.</div>
+                </td>
+                <td>ergashmoq</td>
+                <td>следовать</td>
+            </tr>
+
+            <!-- WORD 50: STOP -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('stop')">▶ Play</button></td>
+                <td><strong>stop</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To not continue.</span>
+                    <div class="examples">Stop it. • Stop talking. • The bus stopped.</div>
+                </td>
+                <td>to'xtatmoq</td>
+                <td>останавливать</td>
+            </tr>
+
+            <!-- WORD 51: SPEAK -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('speak')">▶ Play</button></td>
+                <td><strong>speak</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To talk.</span>
+                    <div class="examples">Speak up. • I speak English. • Can I speak?</div>
+                </td>
+                <td>gapirmoq</td>
+                <td>говорить</td>
+            </tr>
+
+            <!-- WORD 52: OPEN -->
+            <tr class="pos-group">
+                <td rowspan="2"><button onclick="speak('open')">▶ Play</button></td>
+                <td rowspan="2"><strong>open</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="meaning-label">1:</span> <span class="explanation">To make not closed.</span>
+                    <div class="examples">Open the door. • Open your eyes. • Open the box.</div>
+                </td>
+                <td><span class="meaning-label">1:</span> ochmoq</td>
+                <td><span class="meaning-label">1:</span> открывать</td>
+            </tr>
+            <tr class="pos-group word-group">
+                <td>
+                    <span class="pos-label">Adjective</span>
+                    <span class="meaning-label">2:</span> <span class="explanation">Not closed.</span>
+                    <div class="examples">The door is open. • It's open. • Open space.</div>
+                </td>
+                <td><span class="meaning-label">2:</span> ochiq</td>
+                <td><span class="meaning-label">2:</span> открытый</td>
+            </tr>
+
+            <!-- WORD 53: WALK -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('walk')">▶ Play</button></td>
+                <td><strong>walk</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To move on foot.</span>
+                    <div class="examples">Let's walk. • I walk to school. • Walk slowly.</div>
+                </td>
+                <td>yurmoq</td>
+                <td>ходить</td>
+            </tr>
+
+            <!-- WORD 54: WIN -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('win')">▶ Play</button></td>
+                <td><strong>win</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To be first in a game.</span>
+                    <div class="examples">We won. • Win the game. • I want to win.</div>
+                </td>
+                <td>yutmoq</td>
+                <td>побеждать</td>
+            </tr>
+
+            <!-- WORD 55: HELP -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('help')">▶ Play</button></td>
+                <td><strong>help</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To assist.</span>
+                    <div class="examples">Help me. • I'll help you. • Can you help?</div>
+                </td>
+                <td>yordam bermoq</td>
+                <td>помогать</td>
+            </tr>
+
+            <!-- WORD 56: TALK -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('talk')">▶ Play</button></td>
+                <td><strong>talk</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To speak with someone.</span>
+                    <div class="examples">Let's talk. • Talk to me. • We need to talk.</div>
+                </td>
+                <td>gaplashmoq</td>
+                <td>говорить</td>
+            </tr>
+
+            <!-- WORD 57: BUY -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('buy')">▶ Play</button></td>
+                <td><strong>buy</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To get with money.</span>
+                    <div class="examples">Buy food. • I bought it. • Buy a car.</div>
+                </td>
+                <td>sotib olmoq</td>
+                <td>покупать</td>
+            </tr>
+
+            <!-- WORD 58: WAIT -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('wait')">▶ Play</button></td>
+                <td><strong>wait</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To stay until.</span>
+                    <div class="examples">Wait here. • I'm waiting. • Wait for me.</div>
+                </td>
+                <td>kutmoq</td>
+                <td>ждать</td>
+            </tr>
+
+            <!-- WORD 59: SEND -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('send')">▶ Play</button></td>
+                <td><strong>send</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To cause to go.</span>
+                    <div class="examples">Send a message. • I'll send it. • Send this letter.</div>
+                </td>
+                <td>jo'natmoq</td>
+                <td>посылать</td>
+            </tr>
+
+            <!-- WORD 60: LEARN -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('learn')">▶ Play</button></td>
+                <td><strong>learn</strong></td>
+                <td>
+                    <span class="pos-label">Verb</span>
+                    <span class="explanation">To get knowledge.</span>
+                    <div class="examples">Learn English. • I learned it. • Learn new things.</div>
+                </td>
+                <td>o'rganmoq</td>
+                <td>учиться</td>
+            </tr>
+
+            <!-- WORD 61: TIME -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('time')">▶ Play</button></td>
+                <td><strong>time</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">A moment or period.</span>
+                    <div class="examples">What time? • I don't have time. • Time is money.</div>
+                </td>
+                <td>vaqt</td>
+                <td>время</td>
+            </tr>
+
+            <!-- WORD 62: PERSON -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('person')">▶ Play</button></td>
+                <td><strong>person</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">A human.</span>
+                    <div class="examples">Nice person. • Every person. • One person.</div>
+                </td>
+                <td>odam</td>
+                <td>человек</td>
+            </tr>
+
+            <!-- WORD 63: YEAR -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('year')">▶ Play</button></td>
+                <td><strong>year</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">12 months.</span>
+                    <div class="examples">Next year. • This year. • 20 years old.</div>
+                </td>
+                <td>yil</td>
+                <td>год</td>
+            </tr>
+
+            <!-- WORD 64: WAY -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('way')">▶ Play</button></td>
+                <td><strong>way</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">A method or path.</span>
+                    <div class="examples">This way. • By the way. • No way!</div>
+                </td>
+                <td>yo'l</td>
+                <td>путь</td>
+            </tr>
+
+            <!-- WORD 65: DAY -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('day')">▶ Play</button></td>
+                <td><strong>day</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">24 hours.</span>
+                    <div class="examples">Good day. • Every day. • One day.</div>
+                </td>
+                <td>kun</td>
+                <td>день</td>
+            </tr>
+
+            <!-- WORD 66: THING -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('thing')">▶ Play</button></td>
+                <td><strong>thing</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">An object.</span>
+                    <div class="examples">What's that thing? • Many things. • Good thing.</div>
+                </td>
+                <td>narsa</td>
+                <td>вещь</td>
+            </tr>
+
+            <!-- WORD 67: MAN -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('man')">▶ Play</button></td>
+                <td><strong>man</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">An adult male.</span>
+                    <div class="examples">That man. • A good man. • Young man.</div>
+                </td>
+                <td>erkak</td>
+                <td>мужчина</td>
+            </tr>
+
+            <!-- WORD 68: WORLD -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('world')">▶ Play</button></td>
+                <td><strong>world</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">The earth.</span>
+                    <div class="examples">Around the world. • The whole world. • World peace.</div>
+                </td>
+                <td>dunyo</td>
+                <td>мир</td>
+            </tr>
+
+            <!-- WORD 69: LIFE -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('life')">▶ Play</button></td>
+                <td><strong>life</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">Being alive.</span>
+                    <div class="examples">My life. • Life is good. • Real life.</div>
+                </td>
+                <td>hayot</td>
+                <td>жизнь</td>
+            </tr>
+
+            <!-- WORD 70: HAND -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('hand')">▶ Play</button></td>
+                <td><strong>hand</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">Part of your arm.</span>
+                    <div class="examples">My hand. • Shake hands. • Hold my hand.</div>
+                </td>
+                <td>qo'l</td>
+                <td>рука</td>
+            </tr>
+
+            <!-- WORD 71: CHILD -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('child')">▶ Play</button></td>
+                <td><strong>child</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">A young person.</span>
+                    <div class="examples">Little child. • My child. • Children play.</div>
+                </td>
+                <td>bola</td>
+                <td>ребёнок</td>
+            </tr>
+
+            <!-- WORD 72: EYE -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('eye')">▶ Play</button></td>
+                <td><strong>eye</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">Body part for seeing.</span>
+                    <div class="examples">My eyes. • Blue eyes. • Close your eyes.</div>
+                </td>
+                <td>ko'z</td>
+                <td>глаз</td>
+            </tr>
+
+            <!-- WORD 73: WOMAN -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('woman')">▶ Play</button></td>
+                <td><strong>woman</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">An adult female.</span>
+                    <div class="examples">That woman. • Young woman. • Strong woman.</div>
+                </td>
+                <td>ayol</td>
+                <td>женщина</td>
+            </tr>
+
+            <!-- WORD 74: PLACE -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('place')">▶ Play</button></td>
+                <td><strong>place</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">A location.</span>
+                    <div class="examples">Nice place. • My place. • This place.</div>
+                </td>
+                <td>joy</td>
+                <td>место</td>
+            </tr>
+
+            <!-- WORD 75: HOUSE -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('house')">▶ Play</button></td>
+                <td><strong>house</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">A building to live in.</span>
+                    <div class="examples">My house. • Big house. • Go home.</div>
+                </td>
+                <td>uy</td>
+                <td>дом</td>
+            </tr>
+
+            <!-- WORD 76: FRIEND -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('friend')">▶ Play</button></td>
+                <td><strong>friend</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">A person you like.</span>
+                    <div class="examples">My friend. • Best friend. • Good friends.</div>
+                </td>
+                <td>do'st</td>
+                <td>друг</td>
+            </tr>
+
+            <!-- WORD 77: MONEY -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('money')">▶ Play</button></td>
+                <td><strong>money</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">Coins and bills.</span>
+                    <div class="examples">I need money. • Save money. • No money.</div>
+                </td>
+                <td>pul</td>
+                <td>деньги</td>
+            </tr>
+
+            <!-- WORD 78: WATER -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('water')">▶ Play</button></td>
+                <td><strong>water</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">Clear liquid to drink.</span>
+                    <div class="examples">Drink water. • Cold water. • I need water.</div>
+                </td>
+                <td>suv</td>
+                <td>вода</td>
+            </tr>
+
+            <!-- WORD 79: FOOD -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('food')">▶ Play</button></td>
+                <td><strong>food</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">Things to eat.</span>
+                    <div class="examples">Good food. • I need food. • Cook food.</div>
+                </td>
+                <td>ovqat</td>
+                <td>еда</td>
+            </tr>
+
+            <!-- WORD 80: NAME -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('name')">▶ Play</button></td>
+                <td><strong>name</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">What you are called.</span>
+                    <div class="examples">My name is Tom. • What's your name? • Her name.</div>
+                </td>
+                <td>ism</td>
+                <td>имя</td>
+            </tr>
+
+            <!-- WORD 81: BOOK -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('book')">▶ Play</button></td>
+                <td><strong>book</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">Pages to read.</span>
+                    <div class="examples">Read a book. • Good book. • Buy books.</div>
+                </td>
+                <td>kitob</td>
+                <td>книга</td>
+            </tr>
+
+            <!-- WORD 82: SCHOOL -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('school')">▶ Play</button></td>
+                <td><strong>school</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">Place to learn.</span>
+                    <div class="examples">Go to school. • High school. • At school.</div>
+                </td>
+                <td>maktab</td>
+                <td>школа</td>
+            </tr>
+
+            <!-- WORD 83: FAMILY -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('family')">▶ Play</button></td>
+                <td><strong>family</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+<span class="explanation">Parents and children.</span>
+                    <div class="examples">My family. • Big family. • Family time.</div>
+                </td>
+                <td>oila</td>
+                <td>семья</td>
+            </tr>
+
+            <!-- WORD 84: MOTHER -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('mother')">▶ Play</button></td>
+                <td><strong>mother</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">Female parent.</span>
+                    <div class="examples">My mother. • Good mother. • Call your mother.</div>
+                </td>
+                <td>ona</td>
+                <td>мать</td>
+            </tr>
+
+            <!-- WORD 85: FATHER -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('father')">▶ Play</button></td>
+                <td><strong>father</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">Male parent.</span>
+                    <div class="examples">My father. • Ask your father. • Good father.</div>
+                </td>
+                <td>ota</td>
+                <td>отец</td>
+            </tr>
+
+            <!-- WORD 86: CAR -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('car')">▶ Play</button></td>
+                <td><strong>car</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">A vehicle.</span>
+                    <div class="examples">My car. • New car. • Drive a car.</div>
+                </td>
+                <td>mashina</td>
+                <td>машина</td>
+            </tr>
+
+            <!-- WORD 87: DOOR -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('door')">▶ Play</button></td>
+                <td><strong>door</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">Entry to a room.</span>
+                    <div class="examples">Open the door. • Close the door. • Front door.</div>
+                </td>
+                <td>eshik</td>
+                <td>дверь</td>
+            </tr>
+
+            <!-- WORD 88: ROOM -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('room')">▶ Play</button></td>
+                <td><strong>room</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="explanation">Space in a building.</span>
+                    <div class="examples">My room. • Big room. • Living room.</div>
+                </td>
+                <td>xona</td>
+                <td>комната</td>
+            </tr>
+
+            <!-- WORD 89: GOOD -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('good')">▶ Play</button></td>
+                <td><strong>good</strong></td>
+                <td>
+                    <span class="pos-label">Adjective</span>
+                    <span class="explanation">Nice or high quality.</span>
+                    <div class="examples">Good job. • That's good. • Good food.</div>
+                </td>
+                <td>yaxshi</td>
+                <td>хороший</td>
+            </tr>
+
+            <!-- WORD 90: NEW -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('new')">▶ Play</button></td>
+                <td><strong>new</strong></td>
+                <td>
+                    <span class="pos-label">Adjective</span>
+                    <span class="explanation">Recently made.</span>
+                    <div class="examples">New car. • What's new? • Brand new.</div>
+                </td>
+                <td>yangi</td>
+                <td>новый</td>
+            </tr>
+
+            <!-- WORD 91: OLD -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('old')">▶ Play</button></td>
+                <td><strong>old</strong></td>
+                <td>
+                    <span class="pos-label">Adjective</span>
+                    <span class="explanation">Not young or new.</span>
+                    <div class="examples">Old car. • How old? • Old friend.</div>
+                </td>
+                <td>eski, qari</td>
+                <td>старый</td>
+            </tr>
+
+            <!-- WORD 92: BIG -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('big')">▶ Play</button></td>
+                <td><strong>big</strong></td>
+                <td>
+                    <span class="pos-label">Adjective</span>
+                    <span class="explanation">Large in size.</span>
+                    <div class="examples">Big house. • Very big. • Big dog.</div>
+                </td>
+                <td>katta</td>
+                <td>большой</td>
+            </tr>
+
+            <!-- WORD 93: SMALL -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('small')">▶ Play</button></td>
+                <td><strong>small</strong></td>
+                <td>
+                    <span class="pos-label">Adjective</span>
+                    <span class="explanation">Little in size.</span>
+                    <div class="examples">Small room. • Too small. • Small dog.</div>
+                </td>
+                <td>kichik</td>
+                <td>маленький</td>
+            </tr>
+
+            <!-- WORD 94: LONG -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('long')">▶ Play</button></td>
+                <td><strong>long</strong></td>
+                <td>
+                    <span class="pos-label">Adjective</span>
+                    <span class="explanation">Not short.</span>
+                    <div class="examples">Long hair. • A long time. • How long?</div>
+                </td>
+                <td>uzun</td>
+                <td>длинный</td>
+            </tr>
+
+            <!-- WORD 95: GREAT -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('great')">▶ Play</button></td>
+                <td><strong>great</strong></td>
+                <td>
+                    <span class="pos-label">Adjective</span>
+                    <span class="explanation">Very good.</span>
+                    <div class="examples">Great idea. • Feel great. • Great job!</div>
+                </td>
+                <td>ajoyib</td>
+                <td>отличный</td>
+            </tr>
+
+            <!-- WORD 96: LITTLE -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('little')">▶ Play</button></td>
+                <td><strong>little</strong></td>
+                <td>
+                    <span class="pos-label">Adjective</span>
+                    <span class="explanation">Small in size.</span>
+                    <div class="examples">A little bit. • Little brother. • Little time.</div>
+                </td>
+                <td>kichik</td>
+                <td>маленький</td>
+            </tr>
+
+            <!-- WORD 97: OTHER -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('other')">▶ Play</button></td>
+                <td><strong>other</strong></td>
+                <td>
+                    <span class="pos-label">Adjective</span>
+                    <span class="explanation">Different.</span>
+                    <div class="examples">Other people. • The other day. • Other side.</div>
+                </td>
+                <td>boshqa</td>
+                <td>другой</td>
+            </tr>
+
+            <!-- WORD 98: RIGHT -->
+            <tr class="pos-group">
+                <td rowspan="2"><button onclick="speak('right')">▶ Play</button></td>
+                <td rowspan="2"><strong>right</strong></td>
+                <td>
+                    <span class="pos-label">Adjective</span>
+                    <span class="meaning-label">1:</span> <span class="explanation">Correct.</span>
+                    <div class="examples">That's right. • Right answer. • You're right.</div>
+                </td>
+                <td><span class="meaning-label">1:</span> to'g'ri</td>
+                <td><span class="meaning-label">1:</span> правильный</td>
+            </tr>
+            <tr class="pos-group word-group">
+                <td>
+                    <span class="pos-label">Adverb</span>
+                    <span class="meaning-label">2:</span> <span class="explanation">Direction opposite of left.</span>
+                    <div class="examples">Turn right. • On the right. • Right here.</div>
+                </td>
+                <td><span class="meaning-label">2:</span> o'ng</td>
+                <td><span class="meaning-label">2:</span> направо</td>
+            </tr>
+
+            <!-- WORD 99: BACK -->
+            <tr class="pos-group">
+                <td rowspan="2"><button onclick="speak('back')">▶ Play</button></td>
+                <td rowspan="2"><strong>back</strong></td>
+                <td>
+                    <span class="pos-label">Noun</span>
+                    <span class="meaning-label">1:</span> <span class="explanation">Rear part of body.</span>
+                    <div class="examples">My back hurts. • Back of the house. • Stand back.</div>
+                </td>
+                <td><span class="meaning-label">1:</span> orqa</td>
+                <td><span class="meaning-label">1:</span> спина</td>
+            </tr>
+            <tr class="pos-group word-group">
+                <td>
+                    <span class="pos-label">Adverb</span>
+                    <span class="meaning-label">2:</span> <span class="explanation">To a previous place.</span>
+                    <div class="examples">Come back. • Go back. • I'll be back.</div>
+                </td>
+                <td><span class="meaning-label">2:</span> orqaga</td>
+                <td><span class="meaning-label">2:</span> назад</td>
+            </tr>
+
+            <!-- WORD 100: NOW -->
+            <tr class="pos-group word-group">
+                <td><button onclick="speak('now')">▶ Play</button></td>
+                <td><strong>now</strong></td>
+                <td>
+                    <span class="pos-label">Adverb</span>
+                    <span class="explanation">At this time.</span>
+                    <div class="examples">Right now. • Do it now. • What now?</div>
+                </td>
+                <td>hozir</td>
+                <td>сейчас</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    let selectedVoice = null;
+
+    function loadVoices() {
+        const voices = speechSynthesis.getVoices();
+        selectedVoice = voices.find(voice => 
+            voice.name.includes('Google US English') || 
+            voice.name.includes('Google') && voice.lang === 'en-US'
+        );
+        if (!selectedVoice) {
+            selectedVoice = voices.find(voice => 
+                (voice.lang === 'en-US' && 
+                (voice.name.includes('Samantha') || 
+                 voice.name.includes('Zira') ||
+                 voice.name.includes('Female')))
+            );
+        }
+        if (!selectedVoice) {
+            selectedVoice = voices.find(voice => voice.lang === 'en-US');
+        }
+        if (!selectedVoice) {
+            selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
+        }
+    }
+
+    speechSynthesis.onvoiceschanged = loadVoices;
+    loadVoices();
+
+    function speak(word) {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.75;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+        }
+        speechSynthesis.speak(utterance);
+    }
+</script>
+</body>
+</html>
