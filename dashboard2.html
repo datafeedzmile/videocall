@@ -1,0 +1,1730 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trucking Ops + BI Dashboard (Single-file Demo)</title>
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --panel:#0f1621;
+      --panel2:#111b28;
+      --muted:#93a4b8;
+      --text:#e8eef7;
+      --line:#1f2b3b;
+      --good:#35d07f;
+      --warn:#ffcc66;
+      --bad:#ff5c6c;
+      --accent:#6aa6ff;
+      --accent2:#b57bff;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background: radial-gradient(1200px 700px at 20% -10%, rgba(106,166,255,.18), transparent 60%),
+                  radial-gradient(1000px 600px at 90% 0%, rgba(181,123,255,.12), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      font-family:var(--sans);
+    }
+    header{
+      position:sticky; top:0; z-index:5;
+      backdrop-filter: blur(10px);
+      background: rgba(11,15,20,.65);
+      border-bottom:1px solid rgba(31,43,59,.7);
+    }
+    .wrap{max-width:1280px;margin:0 auto;padding:14px 16px}
+    .topbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:10px;min-width:220px}
+    .logo{
+      width:34px;height:34px;border-radius:10px;
+      background: linear-gradient(135deg, rgba(106,166,255,.95), rgba(181,123,255,.85));
+      box-shadow:0 8px 22px rgba(106,166,255,.18);
+    }
+    h1{font-size:14px;margin:0;font-weight:700;letter-spacing:.2px}
+    .sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap;flex:1}
+    .chip, select, input[type="date"]{
+      background: rgba(15,22,33,.8);
+      border:1px solid rgba(31,43,59,.85);
+      color:var(--text);
+      border-radius:999px;
+      padding:8px 10px;
+      font-size:12px;
+      outline:none;
+    }
+    select{padding:8px 12px}
+    .chip{display:flex;gap:8px;align-items:center}
+    .chip b{font-family:var(--mono);font-weight:700;color:#cfe2ff}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tabbtn{
+      border:1px solid rgba(31,43,59,.9);
+      background: rgba(15,22,33,.6);
+      color:var(--muted);
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      cursor:pointer;
+      transition:.15s ease;
+      user-select:none;
+    }
+    .tabbtn.active{
+      color:var(--text);
+      background: linear-gradient(180deg, rgba(106,166,255,.22), rgba(15,22,33,.65));
+      border-color: rgba(106,166,255,.55);
+      box-shadow:0 10px 24px rgba(106,166,255,.10);
+    }
+    main{padding:16px}
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:12px;
+      max-width:1280px;
+      margin:0 auto;
+      padding:0 16px 18px;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(17,27,40,.92), rgba(15,22,33,.88));
+      border:1px solid rgba(31,43,59,.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px 12px;border-bottom:1px solid rgba(31,43,59,.65);
+      background: rgba(17,27,40,.35);
+    }
+    .title{
+      font-size:12px;font-weight:700;color:#d9e6ff;
+      letter-spacing:.15px;
+    }
+    .hint{font-size:11px;color:var(--muted)}
+    .body{padding:12px}
+    .kpis{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:12px;
+      max-width:1280px;
+      margin:0 auto;
+      padding:12px 16px 0;
+    }
+    .kpi{
+      grid-column: span 3;
+      padding:12px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(17,27,40,.94), rgba(15,22,33,.86));
+      border:1px solid rgba(31,43,59,.9);
+      box-shadow: var(--shadow);
+      min-height:92px;
+    }
+    .kpi .label{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:10px}
+    .kpi .value{margin-top:6px;font-size:20px;font-weight:800;letter-spacing:.2px}
+    .kpi .delta{margin-top:4px;font-size:11px;font-family:var(--mono)}
+    .pos{color:var(--good)} .neg{color:var(--bad)} .neu{color:var(--muted)}
+    .badge{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(31,43,59,.9);
+      color:var(--muted);
+      background: rgba(15,22,33,.55);
+      white-space:nowrap;
+    }
+
+    canvas{width:100%;height:220px;display:block}
+    .small canvas{height:160px}
+    .tall canvas{height:300px}
+
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .pill{
+      font-size:11px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(31,43,59,.9);
+      background: rgba(15,22,33,.55);
+      color:var(--muted);
+      display:flex;gap:8px;align-items:center;
+    }
+    .dot{width:8px;height:8px;border-radius:99px;background:var(--muted)}
+    .dot.good{background:var(--good)}
+    .dot.warn{background:var(--warn)}
+    .dot.bad{background:var(--bad)}
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:12px;
+    }
+    th, td{
+      padding:10px 8px;
+      border-bottom:1px solid rgba(31,43,59,.65);
+      text-align:left;
+      vertical-align:middle;
+    }
+    th{
+      font-size:11px;color:var(--muted);font-weight:700;
+      user-select:none; cursor:pointer;
+    }
+    tr:hover td{background: rgba(106,166,255,.06)}
+    .mono{font-family:var(--mono)}
+    .right{text-align:right}
+    .muted{color:var(--muted)}
+    .nowrap{white-space:nowrap}
+
+    .alert{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:10px;
+      border:1px solid rgba(31,43,59,.85);
+      border-radius:12px;
+      background: rgba(15,22,33,.55);
+      margin-bottom:10px;
+    }
+    .alert .aTitle{font-weight:800;font-size:12px}
+    .alert .aMsg{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.25}
+    .alert .aMeta{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:6px}
+    .tag{
+      font-size:10px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(31,43,59,.9);
+      background: rgba(17,27,40,.55);
+      color:#cfe2ff;
+      font-family:var(--mono);
+    }
+    .sev{width:10px;height:10px;border-radius:3px;margin-top:3px}
+    .sev.good{background:var(--good)}
+    .sev.warn{background:var(--warn)}
+    .sev.bad{background:var(--bad)}
+
+    .hidden{display:none !important}
+
+    /* responsive */
+    @media (max-width: 1100px){
+      .kpi{grid-column: span 4}
+    }
+    @media (max-width: 780px){
+      .kpi{grid-column: span 6}
+      .brand{min-width:auto}
+      canvas{height:200px}
+    }
+    @media (max-width: 520px){
+      .kpi{grid-column: span 12}
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <h1>Trucking Ops + BI Dashboard</h1>
+          <div class="sub">Single-file demo · mock data · dark theme</div>
+        </div>
+      </div>
+
+      <div class="filters">
+        <span class="chip">Fleet: <b id="fleetSizeChip">80</b> trucks</span>
+        <label class="chip">From <input id="fromDate" type="date"></label>
+        <label class="chip">To <input id="toDate" type="date"></label>
+        <select id="segmentSel" title="Segment">
+          <option value="ALL">All segments</option>
+          <option value="OTR">OTR</option>
+          <option value="REG">Regional</option>
+          <option value="DED">Dedicated</option>
+        </select>
+        <select id="terminalSel" title="Terminal">
+          <option value="ALL">All terminals</option>
+          <option value="DAL">DAL</option>
+          <option value="CHI">CHI</option>
+          <option value="ATL">ATL</option>
+        </select>
+        <span class="badge" id="asOfBadge">As of —</span>
+      </div>
+
+      <div class="tabs">
+        <button class="tabbtn active" data-tab="overview">Overview</button>
+        <button class="tabbtn" data-tab="operations">Operations</button>
+        <button class="tabbtn" data-tab="safety">Safety</button>
+        <button class="tabbtn" data-tab="maintenance">Maintenance</button>
+        <button class="tabbtn" data-tab="finance">Finance</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="kpis" id="kpiRow">
+  <!-- populated by JS -->
+</section>
+
+<main>
+  <!-- OVERVIEW -->
+  <section id="tab-overview">
+    <div class="grid">
+      <div class="card tall" style="grid-column: span 8;">
+        <div class="hd">
+          <div>
+            <div class="title">Revenue vs Cost (daily)</div>
+            <div class="hint">Shows trend + margin compression immediately</div>
+          </div>
+          <div class="row">
+            <span class="pill"><span class="dot" style="background:var(--accent)"></span>Revenue</span>
+            <span class="pill"><span class="dot" style="background:var(--bad)"></span>Cost</span>
+          </div>
+        </div>
+        <div class="body"><canvas id="revCostChart"></canvas></div>
+      </div>
+
+      <div class="card" style="grid-column: span 4;">
+        <div class="hd">
+          <div>
+            <div class="title">Alerts & Exceptions</div>
+            <div class="hint">What you act on right now</div>
+          </div>
+          <span class="badge" id="alertCount">0</span>
+        </div>
+        <div class="body" id="alertsBox"></div>
+      </div>
+
+      <div class="card small" style="grid-column: span 4;">
+        <div class="hd">
+          <div>
+            <div class="title">Loaded vs Empty Miles</div>
+            <div class="hint">Deadhead is a profit killer</div>
+          </div>
+          <span class="badge" id="emptyPctBadge">—</span>
+        </div>
+        <div class="body"><canvas id="deadheadDonut"></canvas></div>
+      </div>
+
+      <div class="card small" style="grid-column: span 4;">
+        <div class="hd">
+          <div>
+            <div class="title">On-time Performance</div>
+            <div class="hint">Pickup + delivery composite</div>
+          </div>
+          <span class="badge" id="otpBadge">—</span>
+        </div>
+        <div class="body"><canvas id="otpGauge"></canvas></div>
+      </div>
+
+      <div class="card small" style="grid-column: span 4;">
+        <div class="hd">
+          <div>
+            <div class="title">Utilization</div>
+            <div class="hint">Trucks earning vs waiting</div>
+          </div>
+          <span class="badge" id="utilBadge">—</span>
+        </div>
+        <div class="body"><canvas id="utilBar"></canvas></div>
+      </div>
+
+      <div class="card" style="grid-column: span 12;">
+        <div class="hd">
+          <div>
+            <div class="title">Top 10 Underperforming Units</div>
+            <div class="hint">Blend of margin, idle, incidents, and PM overdue</div>
+          </div>
+          <span class="badge">sortable</span>
+        </div>
+        <div class="body">
+          <table id="unitsTable">
+            <thead>
+              <tr>
+                <th data-key="unit">Unit</th>
+                <th data-key="segment">Segment</th>
+                <th data-key="terminal">Terminal</th>
+                <th class="right" data-key="margin">Margin $</th>
+                <th class="right" data-key="rpm">RPM</th>
+                <th class="right" data-key="cpm">CPM</th>
+                <th class="right" data-key="mpg">MPG</th>
+                <th class="right" data-key="idlePct">Idle %</th>
+                <th class="right" data-key="onTime">On-time %</th>
+                <th class="right" data-key="pmOverdue">PM overdue (days)</th>
+                <th class="right" data-key="events">Safety events</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div class="hint" style="margin-top:10px">
+            Operator takeaway: fix deadhead + dwell, coach top offenders, pull overdue PMs, and margin rebounds fast.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPERATIONS -->
+  <section id="tab-operations" class="hidden">
+    <div class="grid">
+      <div class="card" style="grid-column: span 8;">
+        <div class="hd">
+          <div>
+            <div class="title">Load Pipeline & Risk</div>
+            <div class="hint">Booked vs covered vs at-risk (HOS, late, weather, unassigned)</div>
+          </div>
+          <span class="badge" id="pipelineBadge">—</span>
+        </div>
+        <div class="body"><canvas id="pipelineChart"></canvas></div>
+      </div>
+
+      <div class="card" style="grid-column: span 4;">
+        <div class="hd">
+          <div>
+            <div class="title">Dwell Time Hotspots</div>
+            <div class="hint">Detention you can collect (or avoid)</div>
+          </div>
+          <span class="badge" id="dwellBadge">—</span>
+        </div>
+        <div class="body" id="dwellList"></div>
+      </div>
+
+      <div class="card" style="grid-column: span 6;">
+        <div class="hd">
+          <div>
+            <div class="title">Lane Profitability</div>
+            <div class="hint">RPM & margin by lane (mock)</div>
+          </div>
+          <span class="badge">top lanes</span>
+        </div>
+        <div class="body"><canvas id="laneScatter"></canvas></div>
+      </div>
+
+      <div class="card" style="grid-column: span 6;">
+        <div class="hd">
+          <div>
+            <div class="title">Unbilled Delivered Loads</div>
+            <div class="hint">Stops cash leaks; tight ops = fast invoicing</div>
+          </div>
+          <span class="badge" id="unbilledBadge">—</span>
+        </div>
+        <div class="body">
+          <table id="unbilledTable">
+            <thead>
+              <tr>
+                <th data-key="loadId">Load</th>
+                <th data-key="customer">Customer</th>
+                <th class="right" data-key="age">Days since delivery</th>
+                <th class="right" data-key="revenue">Revenue</th>
+                <th data-key="reason">Hold reason</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SAFETY -->
+  <section id="tab-safety" class="hidden">
+    <div class="grid">
+      <div class="card" style="grid-column: span 4;">
+        <div class="hd">
+          <div>
+            <div class="title">Safety Score (composite)</div>
+            <div class="hint">Speeding + harsh + following distance</div>
+          </div>
+          <span class="badge" id="safetyScoreBadge">—</span>
+        </div>
+        <div class="body"><canvas id="safetyGauge"></canvas></div>
+      </div>
+
+      <div class="card" style="grid-column: span 8;">
+        <div class="hd">
+          <div>
+            <div class="title">Events Trend</div>
+            <div class="hint">If this climbs, claims follow</div>
+          </div>
+          <div class="row">
+            <span class="pill"><span class="dot warn"></span>Speeding</span>
+            <span class="pill"><span class="dot bad"></span>Harsh</span>
+            <span class="pill"><span class="dot" style="background:var(--accent2)"></span>HOS</span>
+          </div>
+        </div>
+        <div class="body"><canvas id="eventsTrend"></canvas></div>
+      </div>
+
+      <div class="card" style="grid-column: span 12;">
+        <div class="hd">
+          <div>
+            <div class="title">Driver Coaching Queue</div>
+            <div class="hint">Who needs coaching now (risk-weighted)</div>
+          </div>
+          <span class="badge">sortable</span>
+        </div>
+        <div class="body">
+          <table id="driversTable">
+            <thead>
+              <tr>
+                <th data-key="driver">Driver</th>
+                <th data-key="unit">Unit</th>
+                <th data-key="terminal">Terminal</th>
+                <th class="right" data-key="risk">Risk score</th>
+                <th class="right" data-key="speeding">Speeding</th>
+                <th class="right" data-key="harsh">Harsh</th>
+                <th class="right" data-key="hos">HOS</th>
+                <th class="right" data-key="incidents">Incidents</th>
+                <th class="right" data-key="onTime">On-time %</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAINTENANCE -->
+  <section id="tab-maintenance" class="hidden">
+    <div class="grid">
+      <div class="card" style="grid-column: span 4;">
+        <div class="hd">
+          <div>
+            <div class="title">PM Compliance</div>
+            <div class="hint">Overdue = roadside + downtime</div>
+          </div>
+          <span class="badge" id="pmBadge">—</span>
+        </div>
+        <div class="body"><canvas id="pmGauge"></canvas></div>
+      </div>
+
+      <div class="card" style="grid-column: span 8;">
+        <div class="hd">
+          <div>
+            <div class="title">Maintenance Spend (by system)</div>
+            <div class="hint">Find what’s bleeding money</div>
+          </div>
+          <span class="badge" id="mxSpendBadge">—</span>
+        </div>
+        <div class="body"><canvas id="mxSpendBar"></canvas></div>
+      </div>
+
+      <div class="card" style="grid-column: span 12;">
+        <div class="hd">
+          <div>
+            <div class="title">Units Needing Action</div>
+            <div class="hint">Prioritize by downtime risk + overdue days</div>
+          </div>
+          <span class="badge">top 15</span>
+        </div>
+        <div class="body" id="mxList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINANCE -->
+  <section id="tab-finance" class="hidden">
+    <div class="grid">
+      <div class="card" style="grid-column: span 7;">
+        <div class="hd">
+          <div>
+            <div class="title">AR Aging</div>
+            <div class="hint">Cash reality check</div>
+          </div>
+          <span class="badge" id="arBadge">—</span>
+        </div>
+        <div class="body"><canvas id="arBar"></canvas></div>
+      </div>
+
+      <div class="card" style="grid-column: span 5;">
+        <div class="hd">
+          <div>
+            <div class="title">Accessorial Capture</div>
+            <div class="hint">Detention/layover collected vs eligible</div>
+          </div>
+          <span class="badge" id="accBadge">—</span>
+        </div>
+        <div class="body"><canvas id="accessorialDonut"></canvas></div>
+      </div>
+
+      <div class="card" style="grid-column: span 12;">
+        <div class="hd">
+          <div>
+            <div class="title">Customer Profitability (true margin)</div>
+            <div class="hint">Revenue minus linehaul costs, fuel, deadhead, and accessorial leakage</div>
+          </div>
+          <span class="badge">sortable</span>
+        </div>
+        <div class="body">
+          <table id="custTable">
+            <thead>
+              <tr>
+                <th data-key="customer">Customer</th>
+                <th class="right" data-key="revenue">Revenue</th>
+                <th class="right" data-key="margin">Margin</th>
+                <th class="right" data-key="marginPct">Margin %</th>
+                <th class="right" data-key="emptyPct">Empty %</th>
+                <th class="right" data-key="dwell">Avg dwell (min)</th>
+                <th class="right" data-key="otp">On-time %</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ===========
+   Mock Data
+   =========== */
+const rand = (a,b)=>a+Math.random()*(b-a);
+const irand = (a,b)=>Math.floor(rand(a,b+1));
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
+
+function fmtMoney(n){
+  const s = Math.round(n).toLocaleString();
+  return "$" + s;
+}
+function fmtPct(n){ return (n*100).toFixed(1) + "%"; }
+function fmtNum(n,d=2){ return Number(n).toFixed(d); }
+
+function dateToISO(d){
+  const z = new Date(d);
+  z.setHours(0,0,0,0);
+  return z.toISOString().slice(0,10);
+}
+function addDays(iso, days){
+  const d = new Date(iso+"T00:00:00");
+  d.setDate(d.getDate()+days);
+  return dateToISO(d);
+}
+function daysBetween(aISO,bISO){
+  const a = new Date(aISO+"T00:00:00");
+  const b = new Date(bISO+"T00:00:00");
+  return Math.round((b-a)/86400000);
+}
+
+const SEGMENTS = ["OTR","REG","DED"];
+const TERMINALS = ["DAL","CHI","ATL"];
+const CUSTOMERS = ["Acme Foods","NorthStar Retail","BlueRiver Paper","IronWorks","Sunset Beverages","MetroDC","Pioneer Plastics","Evergreen Grocers","Keystone Auto","Titan Steel"];
+const LANE_PAIRS = [
+  ["DAL","ATL"],["DAL","CHI"],["CHI","ATL"],["ATL","DAL"],["CHI","DAL"],["ATL","CHI"],
+  ["DAL","HOU"],["CHI","IND"],["ATL","CLT"],["DAL","SA"],["CHI","STL"],["ATL","JAX"]
+];
+const HOLD_REASONS = ["Missing POD","Rate confirmation mismatch","Accessorial approval pending","Customer dispute","Incorrect reference #","EDI delay"];
+
+function generateFleet({trucks=80, startISO, endISO}){
+  // Trucks
+  const units = Array.from({length:trucks}).map((_,i)=>{
+    const unitNo = "T" + String(1000+i);
+    const segment = pick(SEGMENTS);
+    const terminal = pick(TERMINALS);
+    const baseMPG = segment==="DED"? rand(6.4,7.6) : segment==="REG"? rand(6.0,7.0) : rand(5.6,6.6);
+    return {
+      unit: unitNo,
+      segment,
+      terminal,
+      baseMPG,
+      pmIntervalDays: pick([35,45,55]),
+      lastPMDaysAgo: irand(5,70),
+      hasActiveFault: Math.random() < 0.16
+    };
+  });
+
+  // Drivers (roughly 1.1 drivers per truck)
+  const drivers = Array.from({length:Math.round(trucks*1.12)}).map((_,i)=>({
+    driver: ["A.","B.","C.","D.","E.","F.","G.","H.","J.","K.","L.","M.","N.","P.","R.","S.","T.","V.","W.","Z."][i%20] + " " +
+            ["Johnson","Smith","Williams","Brown","Jones","Garcia","Miller","Davis","Rodriguez","Martinez","Hernandez","Lopez","Gonzalez","Wilson","Anderson","Thomas","Taylor","Moore","Jackson","Martin"][i%20],
+    unit: pick(units).unit,
+    terminal: pick(TERMINALS),
+  }));
+
+  // Daily rollups
+  const days = [];
+  const nDays = daysBetween(startISO,endISO)+1;
+  for(let k=0;k<nDays;k++){
+    const dayISO = addDays(startISO,k);
+    // demand + seasonality-ish
+    const w = new Date(dayISO+"T00:00:00").getDay();
+    const weekdayFactor = (w===0||w===6)? 0.82 : 1.0;
+    const marketFactor = rand(0.92,1.08);
+
+    // segment/terminal filters applied later; generate per unit day entries
+    const unitDay = units.map(u=>{
+      // availability
+      const down = (Math.random() < (u.hasActiveFault? 0.06 : 0.02));
+      const onRoad = !down && (Math.random() < 0.88*weekdayFactor);
+      const loadedMiles = onRoad ? Math.max(0, rand(220,520)*weekdayFactor) : 0;
+      const emptyMiles  = onRoad ? Math.max(0, loadedMiles*rand(0.08,0.28)) : 0;
+
+      const mpg = clamp(u.baseMPG + rand(-0.6,0.6) - (emptyMiles>loadedMiles*0.25?0.2:0), 4.8, 8.2);
+      const fuelGallons = (loadedMiles+emptyMiles) / mpg;
+      const fuelPrice = rand(3.25,4.15);
+      const fuelCost = fuelGallons * fuelPrice;
+
+      // rate
+      const rpmBase = (u.segment==="DED"? rand(2.15,2.65) : u.segment==="REG"? rand(2.05,2.80) : rand(2.00,3.10));
+      const rpm = rpmBase * marketFactor;
+      const revenue = loadedMiles * rpm + (Math.random()<0.12 ? rand(35,180) : 0); // accessorial sometimes
+
+      // other costs (simplified)
+      const driverCost = onRoad ? (loadedMiles+emptyMiles)*rand(0.62,0.78) : 0;
+      const maintCost = onRoad ? (loadedMiles+emptyMiles)*rand(0.08,0.14) : rand(0,18);
+      const fixedCost = 105; // insurance, overhead allocation per day per unit-ish
+      const cost = fuelCost + driverCost + maintCost + fixedCost;
+
+      // service / dwell / on-time
+      const dwellMin = onRoad ? Math.max(10, rand(40,125) + (Math.random()<0.12? rand(90,220):0)) : 0;
+      const onTime = onRoad ? clamp(rand(0.86,0.98) - (dwellMin>180?0.06:0) - (emptyMiles>loadedMiles*0.25?0.02:0), 0.65, 1.0) : 1;
+
+      // safety events
+      const speeding = onRoad ? (Math.random()<0.18? irand(1,3):0) : 0;
+      const harsh = onRoad ? (Math.random()<0.14? irand(1,2):0) : 0;
+      const hos = onRoad ? (Math.random()<0.06? 1:0) : 0;
+
+      // maintenance compliance
+      const pmDueIn = u.pmIntervalDays - u.lastPMDaysAgo;
+      const pmOverdue = Math.max(0, -pmDueIn + (Math.random()<0.15? irand(0,4):0));
+
+      return {
+        unit:u.unit, segment:u.segment, terminal:u.terminal,
+        down, onRoad, loadedMiles, emptyMiles, mpg, fuelCost, revenue, cost,
+        dwellMin, onTime, speeding, harsh, hos, pmOverdue
+      };
+    });
+
+    // pipeline and AR snapshots (day-level)
+    const booked = Math.round(trucks * rand(0.70,0.95) * weekdayFactor);
+    const covered = Math.round(booked * rand(0.86,0.97));
+    const atRisk = Math.max(0, booked - covered) + irand(0, Math.round(trucks*0.06));
+    const unassigned = Math.max(0, booked - covered);
+
+    const ar = {
+      b0_30: rand(420000, 690000),
+      b31_60: rand(160000, 310000),
+      b61_90: rand(65000, 140000),
+      b90p: rand(25000, 80000),
+    };
+
+    // accessorial capture mock
+    const detEligible = rand(8000, 18000);
+    const detCollected = detEligible * rand(0.55, 0.86);
+
+    days.push({
+      dayISO,
+      unitDay,
+      pipeline:{booked,covered,atRisk,unassigned},
+      ar,
+      accessorial:{eligible:detEligible, collected:detCollected}
+    });
+  }
+
+  // Unbilled loads snapshot
+  const unbilled = Array.from({length: irand(8,18)}).map((_,i)=>({
+    loadId:"L" + String(90000+i),
+    customer: pick(CUSTOMERS),
+    age: irand(1,12),
+    revenue: rand(1200,4200),
+    reason: pick(HOLD_REASONS)
+  }));
+
+  // Customer profitability snapshot
+  const customers = CUSTOMERS.map(c=>{
+    const revenue = rand(85000, 240000);
+    const emptyPct = rand(0.10,0.26);
+    const dwell = rand(55, 140);
+    const otp = rand(0.86, 0.97);
+    const marginPct = clamp(rand(0.07,0.19) - (emptyPct-0.12)*0.45 - (dwell-70)/600, 0.01, 0.22);
+    const margin = revenue * marginPct;
+    return {customer:c, revenue, margin, marginPct, emptyPct, dwell, otp};
+  }).sort((a,b)=>b.margin-a.margin);
+
+  // Dwell hotspots mock
+  const dwellHotspots = Array.from({length:6}).map(()=>({
+    name: pick(CUSTOMERS),
+    avgMin: Math.round(rand(140, 265)),
+    hits: irand(6, 26),
+    estDetention: rand(850, 4600)
+  })).sort((a,b)=>b.avgMin-a.avgMin);
+
+  // Lanes mock (RPM vs Margin)
+  const lanes = Array.from({length:12}).map((_,i)=>{
+    const [o,d] = LANE_PAIRS[i];
+    const rpm = rand(2.00,3.15);
+    const margin = rand(0.06,0.22) - (rpm<2.25? rand(0.02,0.05):0);
+    const vol = irand(12, 70);
+    return {lane:`${o}→${d}`, rpm, margin, vol};
+  });
+
+  return { units, drivers, days, unbilled, customers, dwellHotspots, lanes };
+}
+
+/* ======================
+   Tiny Canvas Chart Kit
+   (no external libs)
+   ====================== */
+function dprCanvas(canvas){
+  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio||1));
+  const rect = canvas.getBoundingClientRect();
+  const w = Math.max(10, Math.floor(rect.width * dpr));
+  const h = Math.max(10, Math.floor(rect.height * dpr));
+  if(canvas.width !== w || canvas.height !== h){
+    canvas.width = w; canvas.height = h;
+  }
+  return {ctx: canvas.getContext("2d"), w, h, dpr};
+}
+function clear(ctx,w,h){
+  ctx.clearRect(0,0,w,h);
+}
+function grid(ctx,w,h){
+  ctx.save();
+  ctx.globalAlpha = 0.8;
+  ctx.strokeStyle = "rgba(31,43,59,.9)";
+  ctx.lineWidth = 1;
+  const pad = 28;
+  const gy = 5;
+  for(let i=0;i<=gy;i++){
+    const y = pad + (h-pad-18)*(i/gy);
+    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(w-10,y); ctx.stroke();
+  }
+  ctx.restore();
+}
+function text(ctx, s, x,y, size=12, color="rgba(147,164,184,.9)", align="left"){
+  ctx.save();
+  ctx.fillStyle=color;
+  ctx.font = `${size}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial`;
+  ctx.textAlign=align;
+  ctx.fillText(s,x,y);
+  ctx.restore();
+}
+
+function lineChart(canvas, series, opts={}){
+  // series: [{name,color, data:[{x,label,y}]}]
+  const {ctx,w,h} = dprCanvas(canvas);
+  clear(ctx,w,h);
+  const padL=34, padT=14, padB=22, padR=12;
+  const W = w - padL - padR;
+  const H = h - padT - padB;
+
+  const all = series.flatMap(s=>s.data.map(p=>p.y));
+  let minY = opts.minY ?? Math.min(...all);
+  let maxY = opts.maxY ?? Math.max(...all);
+  if(minY===maxY){ maxY=minY+1; }
+  const xN = series[0].data.length;
+  const xStep = (xN<=1)? W : (W/(xN-1));
+
+  // grid
+  ctx.save();
+  ctx.strokeStyle="rgba(31,43,59,.85)";
+  ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){
+    const y = padT + H*(i/5);
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+W,y); ctx.stroke();
+  }
+  ctx.restore();
+
+  // y labels
+  const fmt = opts.yFmt || (v=>v.toFixed(0));
+  for(let i=0;i<=5;i++){
+    const v = maxY - (maxY-minY)*(i/5);
+    const y = padT + H*(i/5);
+    text(ctx, fmt(v), padL-6, y+4, 11, "rgba(147,164,184,.9)", "right");
+  }
+
+  // lines
+  series.forEach(s=>{
+    ctx.save();
+    ctx.strokeStyle=s.color;
+    ctx.lineWidth=2.4;
+    ctx.lineJoin="round";
+    ctx.beginPath();
+    s.data.forEach((p,i)=>{
+      const x = padL + i*xStep;
+      const y = padT + (1-(p.y-minY)/(maxY-minY))*H;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    // glow dots
+    ctx.fillStyle=s.color;
+    s.data.forEach((p,i)=>{
+      if(i % Math.max(1, Math.floor(xN/10)) !== 0 && i !== xN-1) return;
+      const x = padL + i*xStep;
+      const y = padT + (1-(p.y-minY)/(maxY-minY))*H;
+      ctx.globalAlpha=0.9;
+      ctx.beginPath(); ctx.arc(x,y,3.2,0,Math.PI*2); ctx.fill();
+    });
+    ctx.restore();
+  });
+
+  // x labels (sparse)
+  const labels = series[0].data.map(p=>p.label);
+  const step = Math.max(1, Math.floor(labels.length/6));
+  for(let i=0;i<labels.length;i+=step){
+    text(ctx, labels[i], padL + i*xStep, h-6, 10, "rgba(147,164,184,.9)", "center");
+  }
+}
+
+function barChart(canvas, items, opts={}){
+  // items: [{label, value, color}]
+  const {ctx,w,h} = dprCanvas(canvas);
+  clear(ctx,w,h);
+  const padL=34, padT=14, padB=22, padR=12;
+  const W = w - padL - padR;
+  const H = h - padT - padB;
+
+  const maxV = Math.max(...items.map(i=>i.value), 1e-9);
+  const n = items.length;
+  const gap = 10;
+  const bw = (W - gap*(n-1))/n;
+
+  // baseline
+  ctx.save();
+  ctx.strokeStyle="rgba(31,43,59,.9)";
+  ctx.beginPath(); ctx.moveTo(padL,padT+H); ctx.lineTo(padL+W,padT+H); ctx.stroke();
+  ctx.restore();
+
+  items.forEach((it,i)=>{
+    const x = padL + i*(bw+gap);
+    const bh = (it.value/maxV)*H;
+    const y = padT + (H-bh);
+
+    // bar
+    ctx.save();
+    ctx.fillStyle = it.color;
+    ctx.globalAlpha = 0.95;
+    roundRect(ctx, x, y, bw, bh, 10);
+    ctx.fill();
+
+    // label
+    text(ctx, it.label, x + bw/2, h-6, 10, "rgba(147,164,184,.9)", "center");
+    ctx.restore();
+  });
+
+  if(opts.valueLabels){
+    items.forEach((it,i)=>{
+      const x = padL + i*(bw+gap) + bw/2;
+      const bh = (it.value/maxV)*H;
+      const y = padT + (H-bh) - 6;
+      text(ctx, opts.valueFmt?opts.valueFmt(it.value):String(it.value), x, y, 11, "rgba(207,226,255,.95)", "center");
+    });
+  }
+}
+
+function donutChart(canvas, parts, opts={}){
+  // parts: [{label,value,color}]
+  const {ctx,w,h} = dprCanvas(canvas);
+  clear(ctx,w,h);
+  const cx=w/2, cy=h/2, r=Math.min(w,h)*0.33, t=r*0.42;
+  const sum = parts.reduce((a,p)=>a+p.value,0) || 1;
+
+  let a0 = -Math.PI/2;
+  parts.forEach(p=>{
+    const a1 = a0 + (p.value/sum)*Math.PI*2;
+    ctx.save();
+    ctx.strokeStyle=p.color;
+    ctx.lineWidth=t;
+    ctx.lineCap="round";
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,a0,a1);
+    ctx.stroke();
+    ctx.restore();
+    a0=a1;
+  });
+
+  const main = opts.centerText || "";
+  const sub = opts.centerSub || "";
+  text(ctx, main, cx, cy+4, 18, "rgba(232,238,247,.95)", "center");
+  text(ctx, sub, cx, cy+24, 11, "rgba(147,164,184,.95)", "center");
+
+  // legend
+  const lx=10, ly=10;
+  parts.forEach((p,i)=>{
+    ctx.save();
+    ctx.fillStyle=p.color;
+    ctx.globalAlpha=0.95;
+    ctx.beginPath(); ctx.arc(lx+6, ly+8+i*16, 4, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+    text(ctx, `${p.label} ${(p.value/sum*100).toFixed(1)}%`, lx+16, ly+12+i*16, 10, "rgba(147,164,184,.95)", "left");
+  });
+}
+
+function gaugeChart(canvas, value01, opts={}){
+  const {ctx,w,h} = dprCanvas(canvas);
+  clear(ctx,w,h);
+  const cx=w/2, cy=h*0.62;
+  const r=Math.min(w,h)*0.38;
+  const start=Math.PI, end=0;
+  const pct=clamp(value01,0,1);
+
+  // background arc
+  ctx.save();
+  ctx.strokeStyle="rgba(31,43,59,.95)";
+  ctx.lineWidth=r*0.18;
+  ctx.lineCap="round";
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,start,end);
+  ctx.stroke();
+  ctx.restore();
+
+  // colored arc
+  const col = pct>=0.92 ? "rgba(53,208,127,.95)" : pct>=0.86 ? "rgba(255,204,102,.95)" : "rgba(255,92,108,.95)";
+  ctx.save();
+  ctx.strokeStyle=col;
+  ctx.lineWidth=r*0.18;
+  ctx.lineCap="round";
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,start, start + (end-start)*pct);
+  ctx.stroke();
+  ctx.restore();
+
+  // pointer
+  const ang = start + (end-start)*pct;
+  const px = cx + Math.cos(ang)*r*0.82;
+  const py = cy + Math.sin(ang)*r*0.82;
+  ctx.save();
+  ctx.strokeStyle="rgba(232,238,247,.9)";
+  ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(px,py); ctx.stroke();
+  ctx.fillStyle="rgba(232,238,247,.95)";
+  ctx.beginPath(); ctx.arc(cx,cy,4.2,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  const center = opts.centerText || fmtPct(pct);
+  const sub = opts.centerSub || "";
+  text(ctx, center, cx, cy-8, 18, "rgba(232,238,247,.95)", "center");
+  text(ctx, sub, cx, cy+14, 11, "rgba(147,164,184,.95)", "center");
+}
+
+function scatterChart(canvas, points, opts={}){
+  // points: [{x,y,label,size,color}]
+  const {ctx,w,h} = dprCanvas(canvas);
+  clear(ctx,w,h);
+  const padL=34,padT=14,padB=26,padR=12;
+  const W=w-padL-padR, H=h-padT-padB;
+
+  const xs=points.map(p=>p.x), ys=points.map(p=>p.y);
+  let minX=Math.min(...xs), maxX=Math.max(...xs);
+  let minY=Math.min(...ys), maxY=Math.max(...ys);
+  if(minX===maxX) maxX=minX+1;
+  if(minY===maxY) maxY=minY+1;
+
+  // grid
+  ctx.save();
+  ctx.strokeStyle="rgba(31,43,59,.85)";
+  for(let i=0;i<=5;i++){
+    const y=padT+H*(i/5);
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+W,y); ctx.stroke();
+  }
+  for(let i=0;i<=5;i++){
+    const x=padL+W*(i/5);
+    ctx.beginPath(); ctx.moveTo(x,padT); ctx.lineTo(x,padT+H); ctx.stroke();
+  }
+  ctx.restore();
+
+  // axes labels
+  text(ctx, opts.xLabel||"X", padL+W/2, h-6, 10, "rgba(147,164,184,.9)", "center");
+  text(ctx, opts.yLabel||"Y", 10, padT+H/2, 10, "rgba(147,164,184,.9)", "left");
+
+  points.forEach(p=>{
+    const x = padL + ((p.x-minX)/(maxX-minX))*W;
+    const y = padT + (1-((p.y-minY)/(maxY-minY)))*H;
+    ctx.save();
+    ctx.fillStyle = p.color || "rgba(106,166,255,.95)";
+    ctx.globalAlpha = 0.9;
+    ctx.beginPath(); ctx.arc(x,y, (p.size||8), 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+    text(ctx, p.label, x, y-10, 10, "rgba(147,164,184,.95)", "center");
+    ctx.restore();
+  });
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  const rr = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr,y);
+  ctx.arcTo(x+w,y,x+w,y+h,rr);
+  ctx.arcTo(x+w,y+h,x,y+h,rr);
+  ctx.arcTo(x,y+h,x,y,rr);
+  ctx.arcTo(x,y,x+w,y,rr);
+  ctx.closePath();
+}
+
+/* ======================
+   App State + Rendering
+   ====================== */
+const state = {
+  fleet: null,
+  fromISO: null,
+  toISO: null,
+  segment: "ALL",
+  terminal: "ALL",
+  tab: "overview",
+  sort: {
+    units: {key:"pmOverdue", dir:"desc"},
+    unbilled: {key:"age", dir:"desc"},
+    drivers: {key:"risk", dir:"desc"},
+    customers: {key:"margin", dir:"desc"},
+  }
+};
+
+function filterUnit(u){
+  if(state.segment!=="ALL" && u.segment!==state.segment) return false;
+  if(state.terminal!=="ALL" && u.terminal!==state.terminal) return false;
+  return true;
+}
+
+function computeRollup(){
+  const {days} = state.fleet;
+  const from = state.fromISO, to = state.toISO;
+
+  const slice = days.filter(d=>d.dayISO>=from && d.dayISO<=to);
+  const unitRows = [];
+  const daily = [];
+
+  slice.forEach(day=>{
+    const rows = day.unitDay.filter(filterUnit);
+    const loaded = rows.reduce((a,r)=>a+r.loadedMiles,0);
+    const empty = rows.reduce((a,r)=>a+r.emptyMiles,0);
+    const rev = rows.reduce((a,r)=>a+r.revenue,0);
+    const cost = rows.reduce((a,r)=>a+r.cost,0);
+    const fuel = rows.reduce((a,r)=>a+r.fuelCost,0);
+    const onTime = rows.length ? rows.reduce((a,r)=>a+r.onTime,0)/rows.length : 1;
+    const onRoad = rows.reduce((a,r)=>a+(r.onRoad?1:0),0);
+    const down = rows.reduce((a,r)=>a+(r.down?1:0),0);
+
+    const idlePct = clamp(rand(0.11,0.32) + (empty>loaded*0.22?0.05:0), 0.05, 0.55); // simplified
+
+    daily.push({
+      dayISO: day.dayISO,
+      loaded, empty, rev, cost, fuel, onTime, onRoad, down, idlePct,
+      pipeline: day.pipeline,
+      ar: day.ar,
+      accessorial: day.accessorial
+    });
+  });
+
+  // current-day snapshot for tables (use last day in range)
+  const lastDay = slice[slice.length-1] || days[days.length-1];
+  const unitSnap = lastDay.unitDay.filter(filterUnit);
+
+  // unit metrics aggregated over range
+  const unitAgg = new Map();
+  slice.forEach(day=>{
+    day.unitDay.filter(filterUnit).forEach(r=>{
+      if(!unitAgg.has(r.unit)){
+        unitAgg.set(r.unit, {unit:r.unit, segment:r.segment, terminal:r.terminal,
+          revenue:0, cost:0, loaded:0, empty:0, fuel:0, mpgSum:0, mpgN:0,
+          idleSum:0, idleN:0, onTimeSum:0, onTimeN:0, pmOverdue:0, events:0
+        });
+      }
+      const a = unitAgg.get(r.unit);
+      a.revenue += r.revenue; a.cost += r.cost;
+      a.loaded += r.loadedMiles; a.empty += r.emptyMiles;
+      a.fuel += r.fuelCost;
+      if(r.onRoad){
+        a.mpgSum += r.mpg; a.mpgN += 1;
+        a.idleSum += r.idlePct; a.idleN += 1;
+        a.onTimeSum += r.onTime; a.onTimeN += 1;
+      }
+      a.pmOverdue = Math.max(a.pmOverdue, r.pmOverdue);
+      a.events += (r.speeding + r.harsh + r.hos);
+    });
+  });
+
+  unitAgg.forEach(a=>{
+    const miles = a.loaded + a.empty;
+    const margin = a.revenue - a.cost;
+    const rpm = a.loaded>0 ? a.revenue/a.loaded : 0;
+    const cpm = miles>0 ? a.cost/miles : 0;
+    const mpg = a.mpgN ? a.mpgSum/a.mpgN : 0;
+    const idlePct = a.idleN ? a.idleSum/a.idleN : 0;
+    const onTime = a.onTimeN ? a.onTimeSum/a.onTimeN : 1;
+    unitRows.push({
+      unit:a.unit, segment:a.segment, terminal:a.terminal,
+      margin, rpm, cpm, mpg, idlePct, onTime, pmOverdue:a.pmOverdue, events:a.events
+    });
+  });
+
+  // driver coaching queue (mock weights)
+  const drivers = state.fleet.drivers
+    .filter(dr=>{
+      // keep drivers whose unit passes filter
+      const u = state.fleet.units.find(x=>x.unit===dr.unit);
+      if(!u) return false;
+      if(state.segment!=="ALL" && u.segment!==state.segment) return false;
+      if(state.terminal!=="ALL" && u.terminal!==state.terminal) return false;
+      return true;
+    })
+    .slice(0, 45)
+    .map(dr=>{
+      // synthesize from lastDay unit events
+      const ur = unitSnap.find(x=>x.unit===dr.unit) || pick(unitSnap);
+      const speeding = irand(0,4) + (ur.speeding?1:0);
+      const harsh = irand(0,3) + (ur.harsh?1:0);
+      const hos = irand(0,2) + (ur.hos?1:0);
+      const incidents = Math.random()<0.14 ? irand(1,2) : 0;
+      const onTime = clamp(rand(0.82,0.98) - (incidents?0.05:0), 0.6, 1.0);
+      const risk = speeding*6 + harsh*7 + hos*12 + incidents*25 + (onTime<0.88? 8:0);
+      return {driver:dr.driver, unit:dr.unit, terminal:dr.terminal, risk, speeding, harsh, hos, incidents, onTime};
+    });
+
+  // finance snapshot
+  const last = daily[daily.length-1] || daily[0];
+  const ar = last ? last.ar : {b0_30:0,b31_60:0,b61_90:0,b90p:0};
+  const accessorial = last ? last.accessorial : {eligible:0,collected:0};
+
+  // maintenance spend by system (mock)
+  const mxSpend = [
+    {label:"Tires", value: rand(28000,52000), color:"rgba(255,204,102,.95)"},
+    {label:"Brakes", value: rand(18000,36000), color:"rgba(181,123,255,.95)"},
+    {label:"Engine", value: rand(24000,61000), color:"rgba(255,92,108,.95)"},
+    {label:"PM", value: rand(14000,29000), color:"rgba(53,208,127,.95)"},
+    {label:"Other", value: rand(9000,22000), color:"rgba(106,166,255,.95)"},
+  ];
+
+  return {daily, unitRows, drivers, ar, accessorial, mxSpend, lastDay};
+}
+
+function buildKPIs(roll){
+  const daily = roll.daily;
+  if(!daily.length) return [];
+
+  const rev = daily.reduce((a,d)=>a+d.rev,0);
+  const cost = daily.reduce((a,d)=>a+d.cost,0);
+  const margin = rev - cost;
+  const marginPct = rev>0 ? margin/rev : 0;
+
+  const loaded = daily.reduce((a,d)=>a+d.loaded,0);
+  const empty = daily.reduce((a,d)=>a+d.empty,0);
+  const miles = loaded+empty;
+  const rpm = loaded>0 ? rev/loaded : 0;
+  const cpm = miles>0 ? cost/miles : 0;
+  const emptyPct = miles>0 ? empty/miles : 0;
+
+  const otp = daily.reduce((a,d)=>a+d.onTime,0)/daily.length;
+  const onRoadAvg = daily.reduce((a,d)=>a+d.onRoad,0)/daily.length;
+  const downAvg = daily.reduce((a,d)=>a+d.down,0)/daily.length;
+
+  // compare to prior period same length (if possible)
+  const len = daily.length;
+  const allDays = state.fleet.days;
+  const fromIdx = allDays.findIndex(d=>d.dayISO===state.fromISO);
+  const priorStartIdx = fromIdx - len;
+  let prior = null;
+  if(priorStartIdx >= 0){
+    const priorSlice = allDays.slice(priorStartIdx, priorStartIdx+len);
+    const p = priorSlice.map(day=>{
+      const rows = day.unitDay.filter(filterUnit);
+      return {
+        rev: rows.reduce((a,r)=>a+r.revenue,0),
+        cost: rows.reduce((a,r)=>a+r.cost,0),
+        loaded: rows.reduce((a,r)=>a+r.loadedMiles,0),
+        empty: rows.reduce((a,r)=>a+r.emptyMiles,0),
+        onTime: rows.length ? rows.reduce((a,r)=>a+r.onTime,0)/rows.length : 1
+      };
+    });
+    prior = {
+      rev: p.reduce((a,x)=>a+x.rev,0),
+      margin: p.reduce((a,x)=>a+(x.rev-x.cost),0),
+      emptyPct: (p.reduce((a,x)=>a+x.empty,0)) / Math.max(1,(p.reduce((a,x)=>a+(x.loaded+x.empty),0))),
+      otp: p.reduce((a,x)=>a+x.onTime,0)/Math.max(1,p.length)
+    };
+  }
+
+  const dRev = prior ? (rev - prior.rev)/Math.max(1, prior.rev) : null;
+  const dMargin = prior ? (margin - prior.margin)/Math.max(1, Math.abs(prior.margin)) : null;
+  const dEmpty = prior ? (emptyPct - prior.emptyPct) : null;
+  const dOtp = prior ? (otp - prior.otp) : null;
+
+  const OR = rev>0 ? cost/rev : 0;
+
+  return [
+    {label:"Revenue", value:fmtMoney(rev), delta:dRev, deltaFmt:v=>fmtPct(v), badge:"range"},
+    {label:"Gross Margin", value:`${fmtMoney(margin)} · ${fmtPct(marginPct)}`, delta:dMargin, deltaFmt:v=>fmtPct(v), badge:"profit"},
+    {label:"RPM / CPM", value:`${fmtNum(rpm,2)} / ${fmtNum(cpm,2)}`, delta:null, badge:"unit economics"},
+    {label:"Empty Miles", value:fmtPct(emptyPct), delta:dEmpty, deltaFmt:v=> (v>=0?"+":"") + (v*100).toFixed(1) + "pp", badge:"deadhead"},
+    {label:"On-time", value:fmtPct(otp), delta:dOtp, deltaFmt:v=> (v>=0?"+":"") + (v*100).toFixed(1) + "pp", badge:"service"},
+    {label:"Utilization", value:`${Math.round(onRoadAvg)} on-road · ${Math.round(downAvg)} down`, delta:null, badge:"capacity"},
+    {label:"Operating Ratio", value: fmtNum(OR, 3), delta:null, badge:"cost discipline"},
+    {label:"Miles (loaded)", value: `${Math.round(loaded).toLocaleString()}`, delta:null, badge:"volume"},
+  ];
+}
+
+function renderKPIRow(kpis){
+  const row = document.getElementById("kpiRow");
+  row.innerHTML = "";
+  kpis.forEach(k=>{
+    const el = document.createElement("div");
+    el.className = "kpi";
+    const delta = (k.delta===null || Number.isNaN(k.delta)) ? "" : (() => {
+      const cls = k.delta>0 ? "pos" : (k.delta<0 ? "neg" : "neu");
+      const sign = (k.delta>0 && k.deltaFmt===fmtPct) ? "+" : "";
+      return `<div class="delta ${cls}">${k.deltaFmt? k.deltaFmt(k.delta) : (sign + k.delta)}</div>`;
+    })();
+    el.innerHTML = `
+      <div class="label">
+        <span>${k.label}</span>
+        <span class="badge">${k.badge||""}</span>
+      </div>
+      <div class="value">${k.value}</div>
+      ${delta}
+    `;
+    row.appendChild(el);
+  });
+}
+
+/* ======================
+   Tables (sortable)
+   ====================== */
+function sortBy(arr, key, dir){
+  const m = dir==="asc" ? 1 : -1;
+  return arr.slice().sort((a,b)=>{
+    const av = a[key], bv=b[key];
+    if(typeof av==="string") return av.localeCompare(bv)*m;
+    return (av-bv)*m;
+  });
+}
+function bindSort(tableId, stateKey){
+  const table = document.getElementById(tableId);
+  const thead = table.querySelector("thead");
+  thead.addEventListener("click", (e)=>{
+    const th = e.target.closest("th");
+    if(!th || !th.dataset.key) return;
+    const key = th.dataset.key;
+    const s = state.sort[stateKey];
+    if(s.key===key) s.dir = (s.dir==="asc"?"desc":"asc");
+    else { s.key=key; s.dir="desc"; }
+    renderAll();
+  });
+}
+
+/* ======================
+   Alerts / Lists
+   ====================== */
+function renderAlerts(roll){
+  const box = document.getElementById("alertsBox");
+  const daily = roll.daily;
+  const last = daily[daily.length-1];
+  if(!last){
+    box.innerHTML = `<div class="hint">No data in selected range.</div>`;
+    document.getElementById("alertCount").textContent = "0";
+    return;
+  }
+
+  // compute alerts from roll
+  const emptyPct = (last.loaded+last.empty)>0 ? last.empty/(last.loaded+last.empty) : 0;
+  const otp = last.onTime;
+  const marginPct = last.rev>0 ? (last.rev-last.cost)/last.rev : 0;
+
+  const pmOverdueUnits = roll.unitRows.filter(u=>u.pmOverdue>=7).length;
+  const riskDrivers = roll.drivers.filter(d=>d.risk>=55).length;
+
+  const alerts = [];
+  if(emptyPct>0.20) alerts.push({sev:"warn", title:"Deadhead elevated", msg:`Empty miles at ${fmtPct(emptyPct)}. Tighten reloads + reposition rules.`, meta:`impact≈ ${fmtMoney(last.cost*0.06)} /day`});
+  if(otp<0.90) alerts.push({sev:"warn", title:"Service risk", msg:`On-time at ${fmtPct(otp)}. Dwell and HOS are likely drivers.`, meta:`at-risk loads≈ ${last.pipeline.atRisk}`});
+  if(marginPct<0.10) alerts.push({sev:"bad", title:"Margin compressed", msg:`Margin at ${fmtPct(marginPct)}. Check RPM by lane + fuel/idle.`, meta:`OR≈ ${(last.cost/Math.max(1,last.rev)).toFixed(3)}`});
+  if(pmOverdueUnits>0) alerts.push({sev: pmOverdueUnits>8?"bad":"warn", title:"PM overdue", msg:`${pmOverdueUnits} units are ≥7 days overdue. Pull them before road calls do.`, meta:`risk↑ breakdown rate`});
+  if(riskDrivers>0) alerts.push({sev: riskDrivers>6?"bad":"warn", title:"Coaching queue", msg:`${riskDrivers} drivers are high-risk this week. Coach now; claims later are expensive.`, meta:`focus: speeding/harsh/HOS`});
+
+  // always add 1-2 operational nudges
+  if(Math.random()<0.7) alerts.push({sev:"good", title:"Detention capture", msg:`Eligible detention exists. Push POD/arrival timestamps to bill it.`, meta:`eligible≈ ${fmtMoney(last.accessorial.eligible)}`});
+  if(Math.random()<0.5) alerts.push({sev:"good", title:"Invoicing hygiene", msg:`Unbilled delivered loads create cash drag. Close holds daily.`, meta:`target: <48h`});
+
+  document.getElementById("alertCount").textContent = String(alerts.length);
+
+  box.innerHTML = alerts.map(a=>`
+    <div class="alert">
+      <div class="sev ${a.sev}"></div>
+      <div>
+        <div class="aTitle">${a.title} <span class="tag">${a.sev.toUpperCase()}</span></div>
+        <div class="aMsg">${a.msg}</div>
+        <div class="aMeta">${a.meta}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderDwellHotspots(list){
+  const box = document.getElementById("dwellList");
+  if(!list.length){ box.innerHTML = `<div class="hint">No hotspots.</div>`; return; }
+  const total = list.reduce((a,x)=>a+x.estDetention,0);
+  document.getElementById("dwellBadge").textContent = `est $${Math.round(total).toLocaleString()}`;
+  box.innerHTML = list.map(x=>`
+    <div class="alert" style="margin-bottom:10px">
+      <div class="sev ${x.avgMin>210?'bad':(x.avgMin>175?'warn':'good')}"></div>
+      <div style="width:100%">
+        <div class="aTitle">${x.name}</div>
+        <div class="aMsg">Avg dwell <b class="mono" style="color:#cfe2ff">${x.avgMin} min</b> · visits <b class="mono">${x.hits}</b></div>
+        <div class="aMeta">detention opportunity≈ ${fmtMoney(x.estDetention)}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderMxList(units){
+  const box = document.getElementById("mxList");
+  const top = units
+    .filter(u=>u.pmOverdue>0)
+    .sort((a,b)=>b.pmOverdue-a.pmOverdue)
+    .slice(0,15);
+
+  if(!top.length){
+    box.innerHTML = `<div class="hint">No overdue PMs in selection.</div>`;
+    return;
+  }
+  box.innerHTML = top.map(u=>`
+    <div class="alert">
+      <div class="sev ${u.pmOverdue>=14?'bad':(u.pmOverdue>=7?'warn':'good')}"></div>
+      <div style="width:100%">
+        <div class="aTitle">${u.unit} <span class="tag">${u.segment}/${u.terminal}</span></div>
+        <div class="aMsg">PM overdue <b class="mono" style="color:#cfe2ff">${u.pmOverdue} days</b> · MPG <b class="mono">${fmtNum(u.mpg,1)}</b> · Idle <b class="mono">${fmtPct(u.idlePct)}</b></div>
+        <div class="aMeta">action: schedule PM + check faults + tires/brakes</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderUnitsTable(rows){
+  const tbody = document.querySelector("#unitsTable tbody");
+  const s = state.sort.units;
+  // Underperforming = low margin, high idle, low on-time, PM overdue, safety events
+  const scored = rows.map(r=>{
+    const score =
+      (-r.margin/12000) +
+      (r.idlePct*2.0) +
+      ((0.92-r.onTime)*3.0) +
+      (r.pmOverdue/10) +
+      (r.events/20);
+    return {...r, score};
+  }).sort((a,b)=>b.score-a.score).slice(0,10);
+
+  const sorted = sortBy(scored, s.key, s.dir);
+
+  tbody.innerHTML = sorted.map(r=>`
+    <tr>
+      <td class="mono nowrap">${r.unit}</td>
+      <td>${r.segment}</td>
+      <td>${r.terminal}</td>
+      <td class="right mono">${fmtMoney(r.margin)}</td>
+      <td class="right mono">${fmtNum(r.rpm,2)}</td>
+      <td class="right mono">${fmtNum(r.cpm,2)}</td>
+      <td class="right mono">${fmtNum(r.mpg,1)}</td>
+      <td class="right mono">${fmtPct(r.idlePct)}</td>
+      <td class="right mono">${fmtPct(r.onTime)}</td>
+      <td class="right mono">${r.pmOverdue}</td>
+      <td class="right mono">${r.events}</td>
+    </tr>
+  `).join("");
+}
+
+function renderUnbilledTable(rows){
+  const tbody = document.querySelector("#unbilledTable tbody");
+  const s = state.sort.unbilled;
+  const sorted = sortBy(rows, s.key, s.dir);
+  const total = rows.reduce((a,x)=>a+x.revenue,0);
+  document.getElementById("unbilledBadge").textContent = `${rows.length} loads · ${fmtMoney(total)}`;
+
+  tbody.innerHTML = sorted.map(r=>`
+    <tr>
+      <td class="mono nowrap">${r.loadId}</td>
+      <td>${r.customer}</td>
+      <td class="right mono">${r.age}</td>
+      <td class="right mono">${fmtMoney(r.revenue)}</td>
+      <td class="muted">${r.reason}</td>
+    </tr>
+  `).join("");
+}
+
+function renderDriversTable(rows){
+  const tbody = document.querySelector("#driversTable tbody");
+  const s = state.sort.drivers;
+  const sorted = sortBy(rows, s.key, s.dir).slice(0,18);
+  tbody.innerHTML = sorted.map(r=>`
+    <tr>
+      <td>${r.driver}</td>
+      <td class="mono">${r.unit}</td>
+      <td>${r.terminal}</td>
+      <td class="right mono">${r.risk}</td>
+      <td class="right mono">${r.speeding}</td>
+      <td class="right mono">${r.harsh}</td>
+      <td class="right mono">${r.hos}</td>
+      <td class="right mono">${r.incidents}</td>
+      <td class="right mono">${fmtPct(r.onTime)}</td>
+    </tr>
+  `).join("");
+}
+
+function renderCustomersTable(rows){
+  const tbody = document.querySelector("#custTable tbody");
+  const s = state.sort.customers;
+  const sorted = sortBy(rows, s.key, s.dir);
+  tbody.innerHTML = sorted.map(r=>`
+    <tr>
+      <td>${r.customer}</td>
+      <td class="right mono">${fmtMoney(r.revenue)}</td>
+      <td class="right mono">${fmtMoney(r.margin)}</td>
+      <td class="right mono">${fmtPct(r.marginPct)}</td>
+      <td class="right mono">${fmtPct(r.emptyPct)}</td>
+      <td class="right mono">${Math.round(r.dwell)}</td>
+      <td class="right mono">${fmtPct(r.otp)}</td>
+    </tr>
+  `).join("");
+}
+
+/* ======================
+   Charts Wiring
+   ====================== */
+function renderCharts(roll){
+  const daily = roll.daily;
+  if(!daily.length) return;
+
+  // Revenue vs cost line
+  const labels = daily.map(d=>d.dayISO.slice(5));
+  const revSeries = daily.map((d,i)=>({x:i,label:labels[i],y:d.rev}));
+  const costSeries = daily.map((d,i)=>({x:i,label:labels[i],y:d.cost}));
+  lineChart(document.getElementById("revCostChart"), [
+    {name:"Revenue", color:"rgba(106,166,255,.95)", data:revSeries},
+    {name:"Cost", color:"rgba(255,92,108,.9)", data:costSeries},
+  ], { yFmt: v => "$"+Math.round(v/1000)+"k" });
+
+  // deadhead donut (use totals)
+  const loaded = daily.reduce((a,x)=>a+x.loaded,0);
+  const empty = daily.reduce((a,x)=>a+x.empty,0);
+  const miles = loaded+empty;
+  const emptyPct = miles>0 ? empty/miles : 0;
+  document.getElementById("emptyPctBadge").textContent = fmtPct(emptyPct);
+  donutChart(document.getElementById("deadheadDonut"), [
+    {label:"Loaded", value:loaded, color:"rgba(53,208,127,.95)"},
+    {label:"Empty", value:empty, color:"rgba(255,204,102,.95)"},
+  ], { centerText: fmtPct(1-emptyPct), centerSub:"loaded" });
+
+  // OTP gauge
+  const otp = daily.reduce((a,x)=>a+x.onTime,0)/daily.length;
+  document.getElementById("otpBadge").textContent = fmtPct(otp);
+  gaugeChart(document.getElementById("otpGauge"), otp, { centerText: fmtPct(otp), centerSub:"on-time" });
+
+  // utilization bar (avg on-road vs down vs waiting)
+  const last = daily[daily.length-1];
+  const fleetCount = Math.max(1, parseInt(document.getElementById("fleetSizeChip").textContent,10));
+  const onRoad = clamp(last.onRoad,0,fleetCount);
+  const down = clamp(last.down,0,fleetCount);
+  const waiting = Math.max(0, fleetCount - onRoad - down);
+  const util = onRoad / Math.max(1, (fleetCount - down));
+  document.getElementById("utilBadge").textContent = fmtPct(util);
+  barChart(document.getElementById("utilBar"), [
+    {label:"On-road", value:onRoad, color:"rgba(106,166,255,.95)"},
+    {label:"Waiting", value:waiting, color:"rgba(147,164,184,.85)"},
+    {label:"Down", value:down, color:"rgba(255,92,108,.9)"},
+  ], { valueLabels:true, valueFmt:v=>String(Math.round(v)) });
+
+  // pipeline stacked-ish (render as grouped bars)
+  const p = last.pipeline;
+  document.getElementById("pipelineBadge").textContent = `booked ${p.booked} · covered ${p.covered} · at-risk ${p.atRisk}`;
+  barChart(document.getElementById("pipelineChart"), [
+    {label:"Booked", value:p.booked, color:"rgba(106,166,255,.95)"},
+    {label:"Covered", value:p.covered, color:"rgba(53,208,127,.95)"},
+    {label:"At-risk", value:p.atRisk, color:"rgba(255,204,102,.95)"},
+    {label:"Unassigned", value:p.unassigned, color:"rgba(255,92,108,.90)"},
+  ], { valueLabels:true, valueFmt:v=>String(Math.round(v)) });
+
+  // lane profitability scatter: x=RPM, y=Margin%, size=volume
+  const lanePts = state.fleet.lanes.map(l=>{
+    const col = l.margin>=0.15 ? "rgba(53,208,127,.95)" : l.margin>=0.10 ? "rgba(255,204,102,.95)" : "rgba(255,92,108,.92)";
+    return {x:l.rpm, y:l.margin, label:l.lane, size: clamp(l.vol/10, 5, 12), color: col};
+  });
+  scatterChart(document.getElementById("laneScatter"), lanePts, {xLabel:"RPM", yLabel:"Margin %"});
+  // events trend
+  const speed = daily.map((d,i)=>({x:i,label:labels[i],y: d.unitCount ? d.speeding : rand(10,30)})); // not tracked at daily; fake below
+  // build from unit rows per day: approximate
+  const speedingTrend = daily.map((d,i)=>{
+    const dayObj = state.fleet.days.find(x=>x.dayISO===d.dayISO);
+    const rows = dayObj.unitDay.filter(filterUnit);
+    const s = rows.reduce((a,r)=>a+r.speeding,0);
+    return {x:i,label:labels[i],y:s};
+  });
+  const harshTrend = daily.map((d,i)=>{
+    const dayObj = state.fleet.days.find(x=>x.dayISO===d.dayISO);
+    const rows = dayObj.unitDay.filter(filterUnit);
+    const s = rows.reduce((a,r)=>a+r.harsh,0);
+    return {x:i,label:labels[i],y:s};
+  });
+  const hosTrend = daily.map((d,i)=>{
+    const dayObj = state.fleet.days.find(x=>x.dayISO===d.dayISO);
+    const rows = dayObj.unitDay.filter(filterUnit);
+    const s = rows.reduce((a,r)=>a+r.hos,0);
+    return {x:i,label:labels[i],y:s};
+  });
+  lineChart(document.getElementById("eventsTrend"), [
+    {name:"Speeding", color:"rgba(255,204,102,.95)", data:speedingTrend},
+    {name:"Harsh", color:"rgba(255,92,108,.90)", data:harshTrend},
+    {name:"HOS", color:"rgba(181,123,255,.92)", data:hosTrend},
+  ], { yFmt:v=>Math.round(v).toString() });
+
+  // safety score gauge (lower is better -> invert to show "good" higher)
+  const totalSpeed = speedingTrend.reduce((a,x)=>a+x.y,0);
+  const totalHarsh = harshTrend.reduce((a,x)=>a+x.y,0);
+  const totalHos = hosTrend.reduce((a,x)=>a+x.y,0);
+  const driverCount = Math.max(1, roll.drivers.length);
+  const rawRisk = (totalSpeed*0.8 + totalHarsh*1.0 + totalHos*2.0) / driverCount; // arbitrary
+  const safetyScore = clamp(1 - rawRisk/6.5, 0, 1);
+  document.getElementById("safetyScoreBadge").textContent = `${Math.round(safetyScore*100)}/100`;
+  gaugeChart(document.getElementById("safetyGauge"), safetyScore, { centerText: `${Math.round(safetyScore*100)}/100`, centerSub:"safety" });
+
+  // PM compliance gauge
+  const pmOver = roll.unitRows.filter(u=>u.pmOverdue>0).length;
+  const totalUnits = roll.unitRows.length || 1;
+  const pmCompliance = clamp(1 - pmOver/totalUnits, 0, 1);
+  document.getElementById("pmBadge").textContent = `${Math.round(pmCompliance*100)}%`;
+  gaugeChart(document.getElementById("pmGauge"), pmCompliance, { centerText: `${Math.round(pmCompliance*100)}%`, centerSub:"PM compliant" });
+
+  // maintenance spend bar
+  const mxSum = roll.mxSpend.reduce((a,x)=>a+x.value,0);
+  document.getElementById("mxSpendBadge").textContent = fmtMoney(mxSum);
+  barChart(document.getElementById("mxSpendBar"), roll.mxSpend, { valueLabels:false });
+
+  // AR aging bar
+  const ar = roll.ar;
+  const arTot = ar.b0_30 + ar.b31_60 + ar.b61_90 + ar.b90p;
+  document.getElementById("arBadge").textContent = fmtMoney(arTot);
+  barChart(document.getElementById("arBar"), [
+    {label:"0–30", value:ar.b0_30, color:"rgba(53,208,127,.95)"},
+    {label:"31–60", value:ar.b31_60, color:"rgba(255,204,102,.95)"},
+    {label:"61–90", value:ar.b61_90, color:"rgba(181,123,255,.95)"},
+    {label:"90+", value:ar.b90p, color:"rgba(255,92,108,.92)"},
+  ], { valueLabels:true, valueFmt:v=>"$"+Math.round(v/1000)+"k" });
+
+  // accessorial donut
+  const acc = roll.accessorial;
+  const captured = clamp(acc.collected,0,acc.eligible);
+  const leaked = Math.max(0, acc.eligible - captured);
+  const capPct = acc.eligible>0 ? captured/acc.eligible : 0;
+  document.getElementById("accBadge").textContent = `${Math.round(capPct*100)}%`;
+  donutChart(document.getElementById("accessorialDonut"), [
+    {label:"Collected", value:captured, color:"rgba(53,208,127,.95)"},
+    {label:"Leakage", value:leaked, color:"rgba(255,92,108,.92)"},
+  ], { centerText: `${Math.round(capPct*100)}%`, centerSub:"captured" });
+}
+
+/* ======================
+   Main render
+   ====================== */
+function renderAll(){
+  const roll = computeRollup();
+
+  // KPI row
+  renderKPIRow(buildKPIs(roll));
+
+  // Overview components
+  renderAlerts(roll);
+  renderUnitsTable(roll.unitRows);
+
+  // Operations
+  renderDwellHotspots(state.fleet.dwellHotspots);
+  renderUnbilledTable(state.fleet.unbilled);
+
+  // Safety
+  renderDriversTable(roll.drivers);
+
+  // Maintenance
+  renderMxList(roll.unitRows);
+
+  // Finance
+  renderCustomersTable(state.fleet.customers);
+
+  // Charts
+  renderCharts(roll);
+
+  // badges
+  document.getElementById("asOfBadge").textContent = `As of ${state.toISO}`;
+}
+
+/* ======================
+   Tabs + controls
+   ====================== */
+function setTab(tab){
+  state.tab = tab;
+  document.querySelectorAll(".tabbtn").forEach(b=>{
+    b.classList.toggle("active", b.dataset.tab===tab);
+  });
+  ["overview","operations","safety","maintenance","finance"].forEach(t=>{
+    document.getElementById("tab-"+t).classList.toggle("hidden", t!==tab);
+  });
+  // ensure charts render to visible sizes
+  setTimeout(renderAll, 0);
+}
+
+function init(){
+  // Default date range = last 14 days
+  const today = new Date();
+  const toISO = dateToISO(today);
+  const fromISO = addDays(toISO, -13);
+
+  // Generate fleet history for last 45 days to support prior-period comparison
+  const histStart = addDays(toISO, -44);
+  const fleet = generateFleet({trucks:80, startISO: histStart, endISO: toISO});
+  state.fleet = fleet;
+
+  // Controls
+  document.getElementById("fleetSizeChip").textContent = String(fleet.units.length);
+
+  const fromInput = document.getElementById("fromDate");
+  const toInput = document.getElementById("toDate");
+  fromInput.value = fromISO;
+  toInput.value = toISO;
+  state.fromISO = fromISO;
+  state.toISO = toISO;
+
+  fromInput.addEventListener("change", ()=>{
+    state.fromISO = fromInput.value || state.fromISO;
+    if(state.fromISO > state.toISO){
+      state.toISO = state.fromISO;
+      toInput.value = state.toISO;
+    }
+    renderAll();
+  });
+  toInput.addEventListener("change", ()=>{
+    state.toISO = toInput.value || state.toISO;
+    if(state.toISO < state.fromISO){
+      state.fromISO = state.toISO;
+      fromInput.value = state.fromISO;
+    }
+    renderAll();
+  });
+
+  document.getElementById("segmentSel").addEventListener("change",(e)=>{
+    state.segment = e.target.value;
+    renderAll();
+  });
+  document.getElementById("terminalSel").addEventListener("change",(e)=>{
+    state.terminal = e.target.value;
+    renderAll();
+  });
+
+  document.querySelectorAll(".tabbtn").forEach(btn=>{
+    btn.addEventListener("click", ()=>setTab(btn.dataset.tab));
+  });
+
+  // sort bindings
+  bindSort("unitsTable", "units");
+  bindSort("unbilledTable", "unbilled");
+  bindSort("driversTable", "drivers");
+  bindSort("custTable", "customers");
+
+  // Resize re-render
+  window.addEventListener("resize", ()=>{
+    // cheap debounce
+    clearTimeout(window.__rz);
+    window.__rz = setTimeout(renderAll, 120);
+  });
+
+  setTab("overview");
+  renderAll();
+}
+
+init();
+</script>
+</body>
+</html>
