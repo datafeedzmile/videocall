@@ -1,0 +1,2361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FleetCommand | Operations Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e14;
+            --bg-secondary: #111820;
+            --bg-tertiary: #1a2332;
+            --bg-card: #151c28;
+            --border-color: #2a3a4d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --accent-cyan: #00d4ff;
+            --accent-green: #2dd4bf;
+            --accent-amber: #fbbf24;
+            --accent-red: #f87171;
+            --accent-purple: #a78bfa;
+            --accent-blue: #3b82f6;
+            --gradient-cyan: linear-gradient(135deg, #00d4ff 0%, #0ea5e9 100%);
+            --gradient-green: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%);
+            --gradient-amber: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            --gradient-red: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-cyan);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--bg-primary);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: var(--accent-cyan);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(45, 212, 191, 0.1);
+            border: 1px solid rgba(45, 212, 191, 0.3);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--accent-green);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .alert-badge {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .alert-badge:hover {
+            border-color: var(--accent-amber);
+        }
+
+        .alert-badge svg {
+            width: 20px;
+            height: 20px;
+            color: var(--text-secondary);
+        }
+
+        .alert-count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Navigation */
+        .nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 24px;
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 14px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            color: var(--accent-cyan);
+            border-bottom-color: var(--accent-cyan);
+        }
+
+        /* Main Content */
+        .main {
+            padding: 24px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Grid Layouts */
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .grid-2-1 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .grid-1-2 {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1200px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .grid-3 { grid-template-columns: 1fr; }
+            .grid-2-1, .grid-1-2 { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .grid-4, .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-green {
+            background: rgba(45, 212, 191, 0.15);
+            color: var(--accent-green);
+        }
+
+        .badge-amber {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--accent-amber);
+        }
+
+        .badge-red {
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--accent-red);
+        }
+
+        .badge-cyan {
+            background: rgba(0, 212, 255, 0.15);
+            color: var(--accent-cyan);
+        }
+
+        /* KPI Cards */
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .kpi-card.cyan::before { background: var(--gradient-cyan); }
+        .kpi-card.green::before { background: var(--gradient-green); }
+        .kpi-card.amber::before { background: var(--gradient-amber); }
+        .kpi-card.red::before { background: var(--gradient-red); }
+
+        .kpi-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .kpi-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .kpi-change {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+        }
+
+        .kpi-change.positive { color: var(--accent-green); }
+        .kpi-change.negative { color: var(--accent-red); }
+
+        .kpi-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Status Cards */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .status-item {
+            text-align: center;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .status-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .status-number.active { color: var(--accent-green); }
+        .status-number.idle { color: var(--accent-amber); }
+        .status-number.maintenance { color: var(--accent-red); }
+        .status-number.enroute { color: var(--accent-cyan); }
+
+        .status-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Gauge */
+        .gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .gauge {
+            position: relative;
+            width: 160px;
+            height: 80px;
+            overflow: hidden;
+        }
+
+        .gauge-bg {
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 16px solid var(--bg-tertiary);
+            border-bottom-color: transparent;
+            border-left-color: transparent;
+            transform: rotate(-45deg);
+        }
+
+        .gauge-fill {
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 16px solid var(--accent-cyan);
+            border-bottom-color: transparent;
+            border-left-color: transparent;
+            transform: rotate(-45deg);
+            transition: transform 1s ease;
+        }
+
+        .gauge-value {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .gauge-label {
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 16px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        tr:hover td {
+            background: var(--bg-tertiary);
+        }
+
+        .table-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-pill.active {
+            background: rgba(45, 212, 191, 0.15);
+            color: var(--accent-green);
+        }
+
+        .status-pill.idle {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--accent-amber);
+        }
+
+        .status-pill.maintenance {
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--accent-red);
+        }
+
+        .status-pill.enroute {
+            background: rgba(0, 212, 255, 0.15);
+            color: var(--accent-cyan);
+        }
+
+        .status-pill.delivered {
+            background: rgba(45, 212, 191, 0.15);
+            color: var(--accent-green);
+        }
+
+        .status-pill.pickup {
+            background: rgba(167, 139, 250, 0.15);
+            color: var(--accent-purple);
+        }
+
+        .status-pill-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.green { background: var(--accent-green); }
+        .progress-fill.cyan { background: var(--accent-cyan); }
+        .progress-fill.amber { background: var(--accent-amber); }
+        .progress-fill.red { background: var(--accent-red); }
+
+        /* Score Circle */
+        .score-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            border: 3px solid;
+        }
+
+        .score-circle.excellent {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .score-circle.good {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .score-circle.warning {
+            border-color: var(--accent-amber);
+            color: var(--accent-amber);
+        }
+
+        .score-circle.critical {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        /* Alert List */
+        .alert-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .alert-item {
+            display: flex;
+            gap: 12px;
+            padding: 14px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border-left: 3px solid;
+        }
+
+        .alert-item.critical { border-left-color: var(--accent-red); }
+        .alert-item.warning { border-left-color: var(--accent-amber); }
+        .alert-item.info { border-left-color: var(--accent-cyan); }
+
+        .alert-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .alert-icon.critical { background: rgba(248, 113, 113, 0.2); color: var(--accent-red); }
+        .alert-icon.warning { background: rgba(251, 191, 36, 0.2); color: var(--accent-amber); }
+        .alert-icon.info { background: rgba(0, 212, 255, 0.2); color: var(--accent-cyan); }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .alert-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .alert-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 250px;
+        }
+
+        .chart-container.tall {
+            height: 350px;
+        }
+
+        /* Activity Feed */
+        .activity-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .activity-dot.delivery { background: var(--accent-green); }
+        .activity-dot.pickup { background: var(--accent-purple); }
+        .activity-dot.alert { background: var(--accent-amber); }
+        .activity-dot.fuel { background: var(--accent-cyan); }
+
+        .activity-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .activity-text strong {
+            color: var(--text-primary);
+        }
+
+        .activity-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Driver Card */
+        .driver-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .driver-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--gradient-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--bg-primary);
+        }
+
+        .driver-info {
+            flex: 1;
+        }
+
+        .driver-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .driver-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .driver-score {
+            text-align: right;
+        }
+
+        .driver-score-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .driver-score-label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Map Placeholder */
+        .map-placeholder {
+            height: 300px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(var(--border-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.3;
+        }
+
+        .map-dots {
+            position: relative;
+            z-index: 1;
+        }
+
+        .map-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 20px var(--accent-cyan);
+            animation: mapPulse 2s infinite;
+        }
+
+        .map-dot:nth-child(2) { animation-delay: 0.3s; }
+        .map-dot:nth-child(3) { animation-delay: 0.6s; }
+        .map-dot:nth-child(4) { animation-delay: 0.9s; }
+        .map-dot:nth-child(5) { animation-delay: 1.2s; }
+
+        @keyframes mapPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+        }
+
+        .map-label {
+            position: relative;
+            z-index: 2;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 120px;
+        }
+
+        /* CSA Score Card */
+        .csa-scores {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .csa-item {
+            text-align: center;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .csa-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .csa-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .csa-threshold {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Metric Row */
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--gradient-cyan);
+            border-radius: 2px;
+        }
+
+        /* Donut Center */
+        .donut-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .donut-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .donut-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Lane Card */
+        .lane-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .lane-route {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .lane-arrow {
+            color: var(--accent-cyan);
+        }
+
+        .lane-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+        }
+
+        .lane-stat {
+            color: var(--text-secondary);
+        }
+
+        .lane-stat span {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">FC</div>
+            <div class="logo-text">Fleet<span>Command</span></div>
+        </div>
+        <div class="header-right">
+            <div class="header-time" id="currentTime">--</div>
+            <div class="header-status">
+                <div class="status-dot"></div>
+                All Systems Operational
+            </div>
+            <div class="alert-badge" onclick="switchTab('alerts')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <div class="alert-count">5</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-tab active" data-tab="overview">Overview</div>
+        <div class="nav-tab" data-tab="fleet">Fleet & Drivers</div>
+        <div class="nav-tab" data-tab="financial">Financial</div>
+        <div class="nav-tab" data-tab="operations">Operations</div>
+        <div class="nav-tab" data-tab="safety">Safety & Compliance</div>
+        <div class="nav-tab" data-tab="alerts">Alerts</div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Overview Tab -->
+        <div class="tab-content active" id="overview">
+            <!-- KPI Row -->
+            <div class="grid-4">
+                <div class="kpi-card cyan">
+                    <div class="kpi-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                        </svg>
+                        Active Fleet
+                    </div>
+                    <div class="kpi-value">72</div>
+                    <div class="kpi-change positive">↑ 4 from yesterday</div>
+                    <div class="kpi-sub">of 78 total trucks</div>
+                </div>
+                <div class="kpi-card green">
+                    <div class="kpi-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                        Today's Revenue
+                    </div>
+                    <div class="kpi-value">$147,820</div>
+                    <div class="kpi-change positive">↑ 12.4% vs avg</div>
+                    <div class="kpi-sub">68 loads delivered</div>
+                </div>
+                <div class="kpi-card amber">
+                    <div class="kpi-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"/>
+                        </svg>
+                        Loads In Progress
+                    </div>
+                    <div class="kpi-value">54</div>
+                    <div class="kpi-change positive">↑ 8 from yesterday</div>
+                    <div class="kpi-sub">12 pending pickup</div>
+                </div>
+                <div class="kpi-card red">
+                    <div class="kpi-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        Active Alerts
+                    </div>
+                    <div class="kpi-value">5</div>
+                    <div class="kpi-change negative">↑ 2 new</div>
+                    <div class="kpi-sub">2 critical, 3 warning</div>
+                </div>
+            </div>
+
+            <div class="grid-2-1">
+                <!-- Fleet Status -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Fleet Status</div>
+                        <div class="card-badge badge-green">Live</div>
+                    </div>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-number enroute">42</div>
+                            <div class="status-label">En Route</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-number active">18</div>
+                            <div class="status-label">Available</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-number idle">12</div>
+                            <div class="status-label">At Stop</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-number maintenance">6</div>
+                            <div class="status-label">Maintenance</div>
+                        </div>
+                    </div>
+                    <div class="map-placeholder" style="margin-top: 20px;">
+                        <div class="map-grid"></div>
+                        <div class="map-dots">
+                            <div class="map-dot" style="top: 40px; left: 80px;"></div>
+                            <div class="map-dot" style="top: 100px; left: 200px;"></div>
+                            <div class="map-dot" style="top: 60px; left: 320px;"></div>
+                            <div class="map-dot" style="top: 140px; left: 150px;"></div>
+                            <div class="map-dot" style="top: 90px; left: 400px;"></div>
+                        </div>
+                        <div class="map-label">72 trucks tracked • Click to expand</div>
+                    </div>
+                </div>
+
+                <!-- Fleet Utilization -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Utilization</div>
+                    </div>
+                    <div class="gauge-container">
+                        <div class="gauge">
+                            <div class="gauge-bg"></div>
+                            <div class="gauge-fill" style="transform: rotate(117deg);"></div>
+                            <div class="gauge-value">92%</div>
+                        </div>
+                        <div class="gauge-label">Fleet Utilization</div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <div class="metric-row">
+                            <span class="metric-label">Miles Today</span>
+                            <span class="metric-value" style="color: var(--accent-cyan);">24,680</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Empty Miles %</span>
+                            <span class="metric-value" style="color: var(--accent-amber);">8.2%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Avg Load Weight</span>
+                            <span class="metric-value">38,420 lbs</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">On-Time Rate</span>
+                            <span class="metric-value" style="color: var(--accent-green);">96.4%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Revenue Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Revenue Trend (7 Days)</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Activity Feed -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Recent Activity</div>
+                    </div>
+                    <div class="activity-feed">
+                        <div class="activity-item">
+                            <div class="activity-dot delivery"></div>
+                            <div>
+                                <div class="activity-text"><strong>Load #4521</strong> delivered to Dallas, TX</div>
+                                <div class="activity-time">2 min ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-dot pickup"></div>
+                            <div>
+                                <div class="activity-text"><strong>Driver M. Johnson</strong> picked up load in Chicago</div>
+                                <div class="activity-time">15 min ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-dot fuel"></div>
+                            <div>
+                                <div class="activity-text"><strong>Truck #T-042</strong> fueled 120 gal at Pilot</div>
+                                <div class="activity-time">28 min ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-dot alert"></div>
+                            <div>
+                                <div class="activity-text"><strong>Truck #T-019</strong> entered maintenance bay</div>
+                                <div class="activity-time">45 min ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-dot delivery"></div>
+                            <div>
+                                <div class="activity-text"><strong>Load #4518</strong> delivered to Phoenix, AZ</div>
+                                <div class="activity-time">1 hr ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fleet & Drivers Tab -->
+        <div class="tab-content" id="fleet">
+            <div class="grid-4">
+                <div class="kpi-card cyan">
+                    <div class="kpi-label">Total Drivers</div>
+                    <div class="kpi-value">84</div>
+                    <div class="kpi-sub">76 active today</div>
+                </div>
+                <div class="kpi-card green">
+                    <div class="kpi-label">Avg Driver Score</div>
+                    <div class="kpi-value">94.2</div>
+                    <div class="kpi-change positive">↑ 2.1 this month</div>
+                </div>
+                <div class="kpi-card amber">
+                    <div class="kpi-label">HOS Violations (MTD)</div>
+                    <div class="kpi-value">3</div>
+                    <div class="kpi-change positive">↓ 5 from last month</div>
+                </div>
+                <div class="kpi-card red">
+                    <div class="kpi-label">Trucks Due Service</div>
+                    <div class="kpi-value">8</div>
+                    <div class="kpi-sub">within 7 days</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Truck Status Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Truck Status</div>
+                        <div class="card-badge badge-cyan">78 Total</div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Truck ID</th>
+                                    <th>Driver</th>
+                                    <th>Status</th>
+                                    <th>Location</th>
+                                    <th>MPG</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="table-mono">T-001</td>
+                                    <td>James Wilson</td>
+                                    <td><span class="status-pill enroute"><span class="status-pill-dot"></span>En Route</span></td>
+                                    <td>I-40, NM</td>
+                                    <td class="table-mono">7.2</td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">T-002</td>
+                                    <td>Sarah Chen</td>
+                                    <td><span class="status-pill active"><span class="status-pill-dot"></span>Available</span></td>
+                                    <td>Phoenix, AZ</td>
+                                    <td class="table-mono">7.8</td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">T-003</td>
+                                    <td>Mike Thompson</td>
+                                    <td><span class="status-pill enroute"><span class="status-pill-dot"></span>En Route</span></td>
+                                    <td>I-10, TX</td>
+                                    <td class="table-mono">6.9</td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">T-004</td>
+                                    <td>—</td>
+                                    <td><span class="status-pill maintenance"><span class="status-pill-dot"></span>Maintenance</span></td>
+                                    <td>Shop</td>
+                                    <td class="table-mono">—</td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">T-005</td>
+                                    <td>David Park</td>
+                                    <td><span class="status-pill idle"><span class="status-pill-dot"></span>At Stop</span></td>
+                                    <td>Denver, CO</td>
+                                    <td class="table-mono">7.4</td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">T-006</td>
+                                    <td>Lisa Martinez</td>
+                                    <td><span class="status-pill enroute"><span class="status-pill-dot"></span>En Route</span></td>
+                                    <td>I-95, GA</td>
+                                    <td class="table-mono">7.1</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Top Drivers -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Top Drivers This Month</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div class="driver-card">
+                            <div class="driver-avatar">JW</div>
+                            <div class="driver-info">
+                                <div class="driver-name">James Wilson</div>
+                                <div class="driver-meta">12,480 mi • 18 loads • 100% on-time</div>
+                            </div>
+                            <div class="driver-score">
+                                <div class="driver-score-value" style="color: var(--accent-green);">98</div>
+                                <div class="driver-score-label">Score</div>
+                            </div>
+                        </div>
+                        <div class="driver-card">
+                            <div class="driver-avatar" style="background: var(--gradient-green);">SC</div>
+                            <div class="driver-info">
+                                <div class="driver-name">Sarah Chen</div>
+                                <div class="driver-meta">11,920 mi • 16 loads • 100% on-time</div>
+                            </div>
+                            <div class="driver-score">
+                                <div class="driver-score-value" style="color: var(--accent-green);">97</div>
+                                <div class="driver-score-label">Score</div>
+                            </div>
+                        </div>
+                        <div class="driver-card">
+                            <div class="driver-avatar" style="background: var(--gradient-amber);">MT</div>
+                            <div class="driver-info">
+                                <div class="driver-name">Mike Thompson</div>
+                                <div class="driver-meta">11,240 mi • 15 loads • 98% on-time</div>
+                            </div>
+                            <div class="driver-score">
+                                <div class="driver-score-value" style="color: var(--accent-cyan);">95</div>
+                                <div class="driver-score-label">Score</div>
+                            </div>
+                        </div>
+                        <div class="driver-card">
+                            <div class="driver-avatar" style="background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);">DP</div>
+                            <div class="driver-info">
+                                <div class="driver-name">David Park</div>
+                                <div class="driver-meta">10,890 mi • 14 loads • 97% on-time</div>
+                            </div>
+                            <div class="driver-score">
+                                <div class="driver-score-value" style="color: var(--accent-cyan);">94</div>
+                                <div class="driver-score-label">Score</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Driver Performance Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Driver Performance Distribution</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="driverPerfChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Maintenance Schedule -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Upcoming Maintenance</div>
+                        <div class="card-badge badge-amber">8 Due</div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Truck</th>
+                                    <th>Service</th>
+                                    <th>Due</th>
+                                    <th>Priority</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="table-mono">T-019</td>
+                                    <td>Brake inspection</td>
+                                    <td>Today</td>
+                                    <td><span class="status-pill maintenance">High</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">T-034</td>
+                                    <td>Oil change</td>
+                                    <td>Tomorrow</td>
+                                    <td><span class="status-pill idle">Medium</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">T-041</td>
+                                    <td>Tire rotation</td>
+                                    <td>Jan 31</td>
+                                    <td><span class="status-pill idle">Medium</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">T-058</td>
+                                    <td>DOT inspection</td>
+                                    <td>Feb 2</td>
+                                    <td><span class="status-pill maintenance">High</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Tab -->
+        <div class="tab-content" id="financial">
+            <div class="grid-4">
+                <div class="kpi-card green">
+                    <div class="kpi-label">Month-to-Date Revenue</div>
+                    <div class="kpi-value">$3.24M</div>
+                    <div class="kpi-change positive">↑ 8.2% vs last month</div>
+                </div>
+                <div class="kpi-card cyan">
+                    <div class="kpi-label">Revenue Per Mile</div>
+                    <div class="kpi-value">$2.84</div>
+                    <div class="kpi-change positive">↑ $0.12</div>
+                </div>
+                <div class="kpi-card amber">
+                    <div class="kpi-label">Fuel Cost (MTD)</div>
+                    <div class="kpi-value">$412K</div>
+                    <div class="kpi-sub">$0.36/mile avg</div>
+                </div>
+                <div class="kpi-card red">
+                    <div class="kpi-label">Outstanding AR</div>
+                    <div class="kpi-value">$847K</div>
+                    <div class="kpi-sub">$124K over 60 days</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Revenue vs Costs Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Revenue vs Operating Costs</div>
+                    </div>
+                    <div class="chart-container tall">
+                        <canvas id="revenueCostChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Cost Breakdown -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Cost Breakdown (MTD)</div>
+                    </div>
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="costBreakdownChart"></canvas>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <div class="metric-row">
+                            <span class="metric-label">Gross Margin</span>
+                            <span class="metric-value" style="color: var(--accent-green);">34.2%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Operating Ratio</span>
+                            <span class="metric-value">88.4%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Revenue/Truck</span>
+                            <span class="metric-value" style="color: var(--accent-cyan);">$41,538</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Cost/Mile</span>
+                            <span class="metric-value">$1.87</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Fuel Price Trend -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Fuel Price Trend (30 Days)</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="fuelPriceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Customers -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Top Customers (MTD)</div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Loads</th>
+                                    <th>Revenue</th>
+                                    <th>%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Amazon Logistics</td>
+                                    <td class="table-mono">142</td>
+                                    <td class="table-mono">$486,200</td>
+                                    <td class="table-mono">15.0%</td>
+                                </tr>
+                                <tr>
+                                    <td>Walmart Supply Chain</td>
+                                    <td class="table-mono">98</td>
+                                    <td class="table-mono">$342,800</td>
+                                    <td class="table-mono">10.6%</td>
+                                </tr>
+                                <tr>
+                                    <td>Home Depot</td>
+                                    <td class="table-mono">76</td>
+                                    <td class="table-mono">$284,600</td>
+                                    <td class="table-mono">8.8%</td>
+                                </tr>
+                                <tr>
+                                    <td>Target Distribution</td>
+                                    <td class="table-mono">64</td>
+                                    <td class="table-mono">$218,400</td>
+                                    <td class="table-mono">6.7%</td>
+                                </tr>
+                                <tr>
+                                    <td>Costco Wholesale</td>
+                                    <td class="table-mono">52</td>
+                                    <td class="table-mono">$196,800</td>
+                                    <td class="table-mono">6.1%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Operations Tab -->
+        <div class="tab-content" id="operations">
+            <div class="grid-4">
+                <div class="kpi-card cyan">
+                    <div class="kpi-label">Active Loads</div>
+                    <div class="kpi-value">54</div>
+                    <div class="kpi-sub">42 en route • 12 at pickup</div>
+                </div>
+                <div class="kpi-card green">
+                    <div class="kpi-label">Delivered Today</div>
+                    <div class="kpi-value">68</div>
+                    <div class="kpi-change positive">↑ 12% vs avg</div>
+                </div>
+                <div class="kpi-card amber">
+                    <div class="kpi-label">Empty Miles %</div>
+                    <div class="kpi-value">8.2%</div>
+                    <div class="kpi-change positive">↓ 1.4% this week</div>
+                </div>
+                <div class="kpi-card red">
+                    <div class="kpi-label">Delayed Loads</div>
+                    <div class="kpi-value">3</div>
+                    <div class="kpi-sub">avg 2.4 hrs late</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Load Status Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Active Loads</div>
+                        <div class="card-badge badge-cyan">54 Active</div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Load #</th>
+                                    <th>Origin → Dest</th>
+                                    <th>Driver</th>
+                                    <th>Status</th>
+                                    <th>ETA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="table-mono">#4523</td>
+                                    <td>LA → Dallas</td>
+                                    <td>J. Wilson</td>
+                                    <td><span class="status-pill enroute"><span class="status-pill-dot"></span>En Route</span></td>
+                                    <td class="table-mono">6:30 PM</td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">#4524</td>
+                                    <td>Chicago → Atlanta</td>
+                                    <td>S. Chen</td>
+                                    <td><span class="status-pill pickup"><span class="status-pill-dot"></span>Pickup</span></td>
+                                    <td class="table-mono">Tomorrow</td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">#4525</td>
+                                    <td>Phoenix → Denver</td>
+                                    <td>M. Thompson</td>
+                                    <td><span class="status-pill enroute"><span class="status-pill-dot"></span>En Route</span></td>
+                                    <td class="table-mono">9:15 PM</td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">#4526</td>
+                                    <td>Seattle → Portland</td>
+                                    <td>D. Park</td>
+                                    <td><span class="status-pill delivered"><span class="status-pill-dot"></span>Delivered</span></td>
+                                    <td class="table-mono">—</td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">#4527</td>
+                                    <td>Houston → Miami</td>
+                                    <td>L. Martinez</td>
+                                    <td><span class="status-pill enroute"><span class="status-pill-dot"></span>En Route</span></td>
+                                    <td class="table-mono">Tomorrow</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Loads by Hour Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Load Volume by Hour (Today)</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="loadVolumeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Top Lanes -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Top Performing Lanes (MTD)</div>
+                    </div>
+                    <div>
+                        <div class="lane-card">
+                            <div class="lane-route">
+                                <span>Los Angeles</span>
+                                <span class="lane-arrow">→</span>
+                                <span>Dallas</span>
+                            </div>
+                            <div class="lane-stats">
+                                <div class="lane-stat">Loads: <span>84</span></div>
+                                <div class="lane-stat">RPM: <span style="color: var(--accent-green);">$3.12</span></div>
+                            </div>
+                        </div>
+                        <div class="lane-card">
+                            <div class="lane-route">
+                                <span>Chicago</span>
+                                <span class="lane-arrow">→</span>
+                                <span>Atlanta</span>
+                            </div>
+                            <div class="lane-stats">
+                                <div class="lane-stat">Loads: <span>72</span></div>
+                                <div class="lane-stat">RPM: <span style="color: var(--accent-green);">$2.98</span></div>
+                            </div>
+                        </div>
+                        <div class="lane-card">
+                            <div class="lane-route">
+                                <span>Seattle</span>
+                                <span class="lane-arrow">→</span>
+                                <span>Phoenix</span>
+                            </div>
+                            <div class="lane-stats">
+                                <div class="lane-stat">Loads: <span>56</span></div>
+                                <div class="lane-stat">RPM: <span style="color: var(--accent-cyan);">$2.76</span></div>
+                            </div>
+                        </div>
+                        <div class="lane-card">
+                            <div class="lane-route">
+                                <span>Houston</span>
+                                <span class="lane-arrow">→</span>
+                                <span>Miami</span>
+                            </div>
+                            <div class="lane-stats">
+                                <div class="lane-stat">Loads: <span>48</span></div>
+                                <div class="lane-stat">RPM: <span style="color: var(--accent-cyan);">$2.68</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- On-Time Performance -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">On-Time Performance (7 Days)</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="onTimeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Safety & Compliance Tab -->
+        <div class="tab-content" id="safety">
+            <div class="grid-4">
+                <div class="kpi-card green">
+                    <div class="kpi-label">Days Without Accident</div>
+                    <div class="kpi-value">127</div>
+                    <div class="kpi-sub">Best: 184 days</div>
+                </div>
+                <div class="kpi-card cyan">
+                    <div class="kpi-label">DOT Pass Rate</div>
+                    <div class="kpi-value">98.2%</div>
+                    <div class="kpi-change positive">↑ 2.1% this quarter</div>
+                </div>
+                <div class="kpi-card amber">
+                    <div class="kpi-label">HOS Violations (MTD)</div>
+                    <div class="kpi-value">3</div>
+                    <div class="kpi-change positive">↓ 62% vs last month</div>
+                </div>
+                <div class="kpi-card red">
+                    <div class="kpi-label">Expiring Documents</div>
+                    <div class="kpi-value">12</div>
+                    <div class="kpi-sub">within 30 days</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- CSA Scores -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">CSA BASIC Scores</div>
+                        <div class="card-badge badge-green">All Below Threshold</div>
+                    </div>
+                    <div class="csa-scores">
+                        <div class="csa-item">
+                            <div class="csa-value" style="color: var(--accent-green);">12</div>
+                            <div class="csa-label">Unsafe Driving</div>
+                            <div class="csa-threshold">Threshold: 65</div>
+                        </div>
+                        <div class="csa-item">
+                            <div class="csa-value" style="color: var(--accent-green);">18</div>
+                            <div class="csa-label">HOS Compliance</div>
+                            <div class="csa-threshold">Threshold: 65</div>
+                        </div>
+                        <div class="csa-item">
+                            <div class="csa-value" style="color: var(--accent-green);">22</div>
+                            <div class="csa-label">Vehicle Maint.</div>
+                            <div class="csa-threshold">Threshold: 80</div>
+                        </div>
+                        <div class="csa-item">
+                            <div class="csa-value" style="color: var(--accent-green);">8</div>
+                            <div class="csa-label">Ctrl Substances</div>
+                            <div class="csa-threshold">Threshold: 65</div>
+                        </div>
+                        <div class="csa-item">
+                            <div class="csa-value" style="color: var(--accent-cyan);">28</div>
+                            <div class="csa-label">Driver Fitness</div>
+                            <div class="csa-threshold">Threshold: 80</div>
+                        </div>
+                        <div class="csa-item">
+                            <div class="csa-value" style="color: var(--accent-green);">5</div>
+                            <div class="csa-label">Crash Indicator</div>
+                            <div class="csa-threshold">Threshold: 65</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Inspections -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Recent DOT Inspections</div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Truck</th>
+                                    <th>Driver</th>
+                                    <th>Result</th>
+                                    <th>Violations</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="table-mono">Jan 28</td>
+                                    <td class="table-mono">T-023</td>
+                                    <td>J. Wilson</td>
+                                    <td><span class="status-pill active">Pass</span></td>
+                                    <td class="table-mono">0</td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">Jan 26</td>
+                                    <td class="table-mono">T-041</td>
+                                    <td>M. Thompson</td>
+                                    <td><span class="status-pill active">Pass</span></td>
+                                    <td class="table-mono">0</td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">Jan 24</td>
+                                    <td class="table-mono">T-012</td>
+                                    <td>D. Park</td>
+                                    <td><span class="status-pill idle">Warning</span></td>
+                                    <td class="table-mono">1</td>
+                                </tr>
+                                <tr>
+                                    <td class="table-mono">Jan 22</td>
+                                    <td class="table-mono">T-067</td>
+                                    <td>S. Chen</td>
+                                    <td><span class="status-pill active">Pass</span></td>
+                                    <td class="table-mono">0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Safety Trend Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Safety Incidents (12 Months)</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="safetyTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Expiring Documents -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Expiring Documents</div>
+                        <div class="card-badge badge-amber">12 Items</div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>ID</th>
+                                    <th>Expires</th>
+                                    <th>Days Left</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>CDL</td>
+                                    <td>Driver #42</td>
+                                    <td class="table-mono">Feb 5</td>
+                                    <td><span class="status-pill maintenance">7</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Medical Card</td>
+                                    <td>Driver #28</td>
+                                    <td class="table-mono">Feb 12</td>
+                                    <td><span class="status-pill idle">14</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Registration</td>
+                                    <td>Truck T-034</td>
+                                    <td class="table-mono">Feb 18</td>
+                                    <td><span class="status-pill idle">20</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Insurance</td>
+                                    <td>Trailer R-089</td>
+                                    <td class="table-mono">Feb 24</td>
+                                    <td><span class="status-pill active">26</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts Tab -->
+        <div class="tab-content" id="alerts">
+            <div class="filter-bar">
+                <button class="filter-btn active">All Alerts</button>
+                <button class="filter-btn">Critical</button>
+                <button class="filter-btn">Warning</button>
+                <button class="filter-btn">Info</button>
+            </div>
+
+            <div class="grid-1-2">
+                <!-- Alert Summary -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Alert Summary</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--accent-red);">● Critical</span>
+                            <span class="table-mono" style="font-size: 24px; font-weight: 700;">2</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill red" style="width: 40%;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--accent-amber);">● Warning</span>
+                            <span class="table-mono" style="font-size: 24px; font-weight: 700;">3</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill amber" style="width: 60%;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--accent-cyan);">● Info</span>
+                            <span class="table-mono" style="font-size: 24px; font-weight: 700;">8</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill cyan" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 24px;">
+                        <div class="metric-row">
+                            <span class="metric-label">Avg Response Time</span>
+                            <span class="metric-value">18 min</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Resolved Today</span>
+                            <span class="metric-value" style="color: var(--accent-green);">12</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alert List -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Active Alerts</div>
+                    </div>
+                    <div class="alert-list">
+                        <div class="alert-item critical">
+                            <div class="alert-icon critical">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                                </svg>
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">Truck T-019 Engine Warning</div>
+                                <div class="alert-desc">Check engine light on. Driver reports rough idle. Vehicle pulled over at Mile Marker 142, I-40.</div>
+                            </div>
+                            <div class="alert-time">12 min ago</div>
+                        </div>
+                        <div class="alert-item critical">
+                            <div class="alert-icon critical">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">Load #4519 Delivery Delayed</div>
+                                <div class="alert-desc">Traffic accident on I-95 causing 3+ hour delay. Customer notified. ETA updated.</div>
+                            </div>
+                            <div class="alert-time">28 min ago</div>
+                        </div>
+                        <div class="alert-item warning">
+                            <div class="alert-icon warning">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">Driver M. Thompson HOS Warning</div>
+                                <div class="alert-desc">45 minutes remaining on drive time. Must take 30-min break within 1 hour.</div>
+                            </div>
+                            <div class="alert-time">45 min ago</div>
+                        </div>
+                        <div class="alert-item warning">
+                            <div class="alert-icon warning">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                                </svg>
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">Truck T-034 Maintenance Due</div>
+                                <div class="alert-desc">Oil change due in 500 miles. Schedule service before next dispatch.</div>
+                            </div>
+                            <div class="alert-time">1 hr ago</div>
+                        </div>
+                        <div class="alert-item warning">
+                            <div class="alert-icon warning">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+                                    <path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/>
+                                </svg>
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">Severe Weather Alert - Texas</div>
+                                <div class="alert-desc">Winter storm warning for I-40 corridor. 4 trucks in affected area. Monitor conditions.</div>
+                            </div>
+                            <div class="alert-time">2 hr ago</div>
+                        </div>
+                        <div class="alert-item info">
+                            <div class="alert-icon info">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                                </svg>
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">Fuel Price Drop - Phoenix Area</div>
+                                <div class="alert-desc">Diesel dropped $0.15/gal at Pilot Travel Centers in Phoenix metro. 3 trucks nearby.</div>
+                            </div>
+                            <div class="alert-time">3 hr ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            };
+            document.getElementById('currentTime').textContent = now.toLocaleDateString('en-US', options);
+        }
+        updateTime();
+        setInterval(updateTime, 60000);
+
+        // Tab switching
+        const tabs = document.querySelectorAll('.nav-tab');
+        const contents = document.querySelectorAll('.tab-content');
+
+        function switchTab(tabId) {
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${tabId}"]`)?.classList.add('active');
+            document.getElementById(tabId)?.classList.add('active');
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        });
+
+        // Chart.js global config
+        Chart.defaults.color = '#8b949e';
+        Chart.defaults.borderColor = '#2a3a4d';
+        Chart.defaults.font.family = "'Space Grotesk', sans-serif";
+
+        // Revenue Chart (Overview)
+        new Chart(document.getElementById('revenueChart'), {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [128400, 142800, 135600, 156200, 147820, 138900, 152400],
+                    borderColor: '#00d4ff',
+                    backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#00d4ff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: { color: 'rgba(42, 58, 77, 0.5)' },
+                        ticks: {
+                            callback: value => '$' + (value/1000) + 'K'
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Driver Performance Chart
+        new Chart(document.getElementById('driverPerfChart'), {
+            type: 'bar',
+            data: {
+                labels: ['90-100', '80-89', '70-79', '60-69', '<60'],
+                datasets: [{
+                    label: 'Drivers',
+                    data: [42, 28, 10, 3, 1],
+                    backgroundColor: ['#2dd4bf', '#00d4ff', '#fbbf24', '#f97316', '#f87171'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(42, 58, 77, 0.5)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Revenue vs Costs Chart
+        new Chart(document.getElementById('revenueCostChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Oct', 'Nov', 'Dec', 'Jan'],
+                datasets: [
+                    {
+                        label: 'Revenue',
+                        data: [2980000, 3120000, 3450000, 3240000],
+                        backgroundColor: '#2dd4bf',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Costs',
+                        data: [2150000, 2280000, 2420000, 2130000],
+                        backgroundColor: '#f87171',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { boxWidth: 12, padding: 20 }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(42, 58, 77, 0.5)' },
+                        ticks: {
+                            callback: value => '$' + (value/1000000).toFixed(1) + 'M'
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Cost Breakdown Doughnut
+        new Chart(document.getElementById('costBreakdownChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Fuel', 'Driver Pay', 'Maintenance', 'Insurance', 'Other'],
+                datasets: [{
+                    data: [412000, 890000, 186000, 142000, 500000],
+                    backgroundColor: ['#fbbf24', '#00d4ff', '#f87171', '#a78bfa', '#6e7681'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { boxWidth: 12, padding: 12 }
+                    }
+                }
+            }
+        });
+
+        // Fuel Price Chart
+        new Chart(document.getElementById('fuelPriceChart'), {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 30}, (_, i) => i + 1),
+                datasets: [{
+                    label: 'Diesel $/gal',
+                    data: [3.42, 3.44, 3.45, 3.48, 3.52, 3.51, 3.49, 3.47, 3.45, 3.44, 
+                           3.46, 3.48, 3.51, 3.54, 3.56, 3.58, 3.55, 3.52, 3.48, 3.45,
+                           3.42, 3.40, 3.38, 3.36, 3.35, 3.34, 3.36, 3.38, 3.39, 3.41],
+                    borderColor: '#fbbf24',
+                    backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: { color: 'rgba(42, 58, 77, 0.5)' },
+                        ticks: {
+                            callback: value => '$' + value.toFixed(2)
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            callback: (value, index) => index % 5 === 0 ? 'Day ' + (index + 1) : ''
+                        }
+                    }
+                }
+            }
+        });
+
+        // Load Volume Chart
+        new Chart(document.getElementById('loadVolumeChart'), {
+            type: 'bar',
+            data: {
+                labels: ['6AM', '8AM', '10AM', '12PM', '2PM', '4PM', '6PM', '8PM'],
+                datasets: [
+                    {
+                        label: 'Pickups',
+                        data: [4, 12, 18, 8, 14, 16, 6, 2],
+                        backgroundColor: '#a78bfa',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Deliveries',
+                        data: [2, 8, 14, 12, 18, 22, 10, 4],
+                        backgroundColor: '#2dd4bf',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { boxWidth: 12, padding: 20 }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(42, 58, 77, 0.5)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // On-Time Performance Chart
+        new Chart(document.getElementById('onTimeChart'), {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'On-Time %',
+                    data: [94.2, 96.8, 95.4, 97.2, 96.4, 98.1, 95.8],
+                    borderColor: '#2dd4bf',
+                    backgroundColor: 'rgba(45, 212, 191, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#2dd4bf'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        min: 90,
+                        max: 100,
+                        grid: { color: 'rgba(42, 58, 77, 0.5)' },
+                        ticks: {
+                            callback: value => value + '%'
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Safety Trend Chart
+        new Chart(document.getElementById('safetyTrendChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'],
+                datasets: [
+                    {
+                        label: 'Accidents',
+                        data: [1, 0, 1, 0, 2, 0, 1, 0, 0, 1, 0, 0],
+                        backgroundColor: '#f87171',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Violations',
+                        data: [3, 4, 2, 5, 3, 4, 2, 3, 4, 2, 3, 3],
+                        backgroundColor: '#fbbf24',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { boxWidth: 12, padding: 20 }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(42, 58, 77, 0.5)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
