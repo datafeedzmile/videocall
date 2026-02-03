@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Photo Capture</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 24px;
+      color: #1a1a1a;
+    }
+
+    /* Hidden file input */
+    #cameraInput {
+      display: none;
+    }
+
+    /* Take Photo Button */
+    .capture-btn {
+      width: 100%;
+      padding: 16px 24px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+      background: #2481cc;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.2s;
+    }
+
+    .capture-btn:hover {
+      background: #1d6eb0;
+    }
+
+    .capture-btn:active {
+      transform: scale(0.98);
+    }
+
+    .capture-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Preview Section */
+    .preview-section {
+      display: none;
+      margin-top: 24px;
+    }
+
+    .preview-section.active {
+      display: block;
+    }
+
+    .preview-container {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .thumbnail-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #e0e0e0;
+    }
+
+    .thumbnail {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .success-message {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 12px;
+      background: #e8f5e9;
+      border-radius: 8px;
+      color: #2e7d32;
+      font-weight: 500;
+    }
+
+    .success-message svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 12px 16px;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-retake {
+      background: #f0f0f0;
+      border: none;
+      color: #333;
+    }
+
+    .btn-retake:hover {
+      background: #e0e0e0;
+    }
+
+    .btn-clear {
+      background: white;
+      border: 2px solid #ef5350;
+      color: #ef5350;
+    }
+
+    .btn-clear:hover {
+      background: #ffebee;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+      width: 100%;
+      margin-top: 24px;
+      padding: 16px 24px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+      background: #4caf50;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .submit-btn:hover {
+      background: #43a047;
+    }
+
+    .submit-btn:active {
+      transform: scale(0.98);
+    }
+
+    .submit-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📷 Take a Photo</h1>
+
+    <!-- Hidden file input that opens camera -->
+    <input 
+      type="file" 
+      id="cameraInput" 
+      accept="image/*" 
+      capture="environment"
+    >
+
+    <!-- Take Photo Button -->
+    <button class="capture-btn" id="captureBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+      </svg>
+      Take Photo
+    </button>
+
+    <!-- Preview Section (hidden until photo taken) -->
+    <div class="preview-section" id="previewSection">
+      <div class="preview-container">
+        <div class="thumbnail-wrapper">
+          <img id="thumbnail" class="thumbnail" src="" alt="Captured photo">
+        </div>
+        
+        <div class="success-message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          Photo captured successfully!
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn-secondary btn-retake" id="retakeBtn">
+            Retake
+          </button>
+          <button class="btn-secondary btn-clear" id="clearBtn">
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <button class="submit-btn" id="submitBtn" disabled>
+      Submit
+    </button>
+  </div>
+
+  <script>
+    // Initialize Telegram Web App if available
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.ready();
+      Telegram.WebApp.expand();
+    }
+
+    // Elements
+    const cameraInput = document.getElementById('cameraInput');
+    const captureBtn = document.getElementById('captureBtn');
+    const previewSection = document.getElementById('previewSection');
+    const thumbnail = document.getElementById('thumbnail');
+    const retakeBtn = document.getElementById('retakeBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Store the captured image data
+    let capturedImageData = null;
+
+    // Open camera when capture button clicked
+    captureBtn.addEventListener('click', () => {
+      cameraInput.click();
+    });
+
+    // Handle file selection (photo taken)
+    cameraInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = (event) => {
+          capturedImageData = event.target.result;
+          
+          // Save to localStorage
+          try {
+            localStorage.setItem('capturedPhoto', capturedImageData);
+          } catch (err) {
+            console.log('localStorage not available:', err);
+          }
+          
+          // Show preview
+          thumbnail.src = capturedImageData;
+          previewSection.classList.add('active');
+          submitBtn.disabled = false;
+          
+          // Update capture button text
+          captureBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            Take Another Photo
+          `;
+        };
+        
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Retake photo
+    retakeBtn.addEventListener('click', () => {
+      cameraInput.value = ''; // Reset input
+      cameraInput.click();
+    });
+
+    // Clear photo
+    clearBtn.addEventListener('click', () => {
+      capturedImageData = null;
+      thumbnail.src = '';
+      previewSection.classList.remove('active');
+      submitBtn.disabled = true;
+      cameraInput.value = '';
+      
+      // Clear from localStorage
+      try {
+        localStorage.removeItem('capturedPhoto');
+      } catch (err) {
+        console.log('localStorage not available:', err);
+      }
+      
+      // Reset capture button text
+      captureBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        Take Photo
+      `;
+    });
+
+    // Submit button (does nothing, just for show)
+    submitBtn.addEventListener('click', () => {
+      console.log('Submit clicked. Image data:', capturedImageData ? 'Present' : 'None');
+      // Does nothing as requested
+    });
+
+    // Load any previously saved photo on page load
+    window.addEventListener('load', () => {
+      try {
+        const savedPhoto = localStorage.getItem('capturedPhoto');
+        if (savedPhoto) {
+          capturedImageData = savedPhoto;
+          thumbnail.src = capturedImageData;
+          previewSection.classList.add('active');
+          submitBtn.disabled = false;
+        }
+      } catch (err) {
+        console.log('localStorage not available:', err);
+      }
+    });
+  </script>
+</body>
+</html>
