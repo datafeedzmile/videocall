@@ -19,6 +19,7 @@
       background: #121212;
       min-height: 100vh;
       padding: 16px;
+      padding-bottom: 100px;
       color: #e0e0e0;
     }
 
@@ -109,126 +110,139 @@
       color: #fff;
     }
 
-    /* Hidden file input */
-    #cameraInput {
+    /* Section Title */
+    .section-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #888;
+      margin: 24px 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #2a2a2a;
+    }
+
+    /* Media Item Card */
+    .media-item {
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid #2a2a2a;
+    }
+
+    .media-item.completed {
+      border-color: #4CAF50;
+    }
+
+    /* Hidden inputs */
+    .hidden-input {
       display: none;
     }
 
-    /* Take Photo Button - Large */
+    /* Capture Button */
     .capture-btn {
       width: 100%;
-      padding: 32px 24px;
-      font-size: 1.2rem;
+      padding: 24px 20px;
+      font-size: 1rem;
       font-weight: 600;
       color: white;
       background: linear-gradient(135deg, #4CAF50, #2E7D32);
       border: none;
-      border-radius: 16px;
+      border-radius: 12px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 8px;
       transition: transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.25);
+    }
+
+    .capture-btn.video-btn {
+      background: linear-gradient(135deg, #FF5722, #E64A19);
+      box-shadow: 0 4px 15px rgba(255, 87, 34, 0.25);
     }
 
     .capture-btn:active {
       transform: scale(0.98);
-      box-shadow: 0 2px 10px rgba(76, 175, 80, 0.2);
     }
 
     .capture-btn svg {
-      width: 48px;
-      height: 48px;
+      width: 36px;
+      height: 36px;
+    }
+
+    .capture-btn-title {
+      font-size: 1rem;
+      font-weight: 600;
     }
 
     .capture-btn-hint {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 400;
       opacity: 0.85;
-    }
-
-    .capture-btn.has-photo {
-      padding: 16px 24px;
-      flex-direction: row;
-      background: #2a2a2a;
-      box-shadow: none;
-    }
-
-    .capture-btn.has-photo svg {
-      width: 24px;
-      height: 24px;
-    }
-
-    .capture-btn.has-photo .capture-btn-hint {
-      display: none;
     }
 
     /* Preview Section */
     .preview-section {
       display: none;
-      margin-top: 20px;
     }
 
     .preview-section.active {
       display: block;
     }
 
-    .preview-container {
-      background: #1e1e1e;
-      border-radius: 12px;
-      padding: 16px;
-      border: 1px solid #2a2a2a;
-    }
-
-    /* Image Label */
-    .image-label {
+    .preview-label {
       display: flex;
       align-items: center;
       gap: 8px;
       margin-bottom: 12px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #2a2a2a;
     }
 
-    .image-label-icon {
-      width: 32px;
-      height: 32px;
+    .preview-label-icon {
+      width: 28px;
+      height: 28px;
       background: rgba(76, 175, 80, 0.15);
-      border-radius: 8px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .image-label-icon svg {
-      width: 18px;
-      height: 18px;
+    .preview-label-icon svg {
+      width: 16px;
+      height: 16px;
       color: #4CAF50;
     }
 
-    .image-label-text {
+    .preview-label-icon.video-icon {
+      background: rgba(255, 87, 34, 0.15);
+    }
+
+    .preview-label-icon.video-icon svg {
+      color: #FF5722;
+    }
+
+    .preview-label-text {
       flex: 1;
-    }
-
-    .image-label-title {
-      font-size: 0.95rem;
-      font-weight: 600;
+      font-size: 0.9rem;
+      font-weight: 500;
       color: #fff;
-    }
-
-    .image-label-desc {
-      font-size: 0.75rem;
-      color: #888;
-      margin-top: 2px;
     }
 
     .thumbnail-wrapper {
       position: relative;
       width: 100%;
-      aspect-ratio: 4/3;
+      aspect-ratio: 16/10;
       border-radius: 10px;
       overflow: hidden;
       background: #2a2a2a;
@@ -242,13 +256,13 @@
 
     .success-badge {
       position: absolute;
-      top: 12px;
-      right: 12px;
+      top: 10px;
+      right: 10px;
       background: rgba(76, 175, 80, 0.9);
       color: white;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.75rem;
+      padding: 5px 10px;
+      border-radius: 16px;
+      font-size: 0.7rem;
       font-weight: 600;
       display: flex;
       align-items: center;
@@ -256,23 +270,23 @@
     }
 
     .success-badge svg {
-      width: 14px;
-      height: 14px;
+      width: 12px;
+      height: 12px;
     }
 
     /* Action Buttons */
     .action-buttons {
       display: flex;
-      gap: 10px;
-      margin-top: 12px;
+      gap: 8px;
+      margin-top: 10px;
     }
 
-    .btn-secondary {
+    .btn-small {
       flex: 1;
-      padding: 14px 16px;
-      font-size: 0.95rem;
+      padding: 10px 12px;
+      font-size: 0.85rem;
       font-weight: 500;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.15s;
       border: none;
@@ -296,20 +310,159 @@
       background: rgba(239, 83, 80, 0.25);
     }
 
-    /* Submit Button */
+    /* Questions Section */
+    .question-card {
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid #2a2a2a;
+    }
+
+    .question-text {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .question-options {
+      display: flex;
+      gap: 10px;
+    }
+
+    .option-btn {
+      flex: 1;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 2px solid #2a2a2a;
+      background: transparent;
+      color: #888;
+    }
+
+    .option-btn.selected-yes {
+      border-color: #FF9800;
+      background: rgba(255, 152, 0, 0.15);
+      color: #FF9800;
+    }
+
+    .option-btn.selected-no {
+      border-color: #4CAF50;
+      background: rgba(76, 175, 80, 0.15);
+      color: #4CAF50;
+    }
+
+    /* Conditional Photo Section */
+    .conditional-photos {
+      display: none;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #2a2a2a;
+    }
+
+    .conditional-photos.active {
+      display: block;
+    }
+
+    .conditional-label {
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 12px;
+    }
+
+    .photo-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .photo-thumb {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      background: #2a2a2a;
+    }
+
+    .photo-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-thumb-remove {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      background: rgba(0, 0, 0, 0.7);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .add-photo-btn {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      background: #2a2a2a;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .add-photo-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .add-photo-btn:active {
+      background: #333;
+    }
+
+    /* Submit Button Fixed at Bottom */
+    .submit-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px;
+      background: linear-gradient(to top, #121212 80%, transparent);
+    }
+
     .submit-btn {
       width: 100%;
-      margin-top: 24px;
+      max-width: 480px;
+      margin: 0 auto;
+      display: block;
       padding: 18px 24px;
       font-size: 1.1rem;
       font-weight: 600;
       color: white;
-      background: linear-gradient(135deg, #2196F3, #1565C0);
+      background: linear-gradient(135deg, #4CAF50, #2E7D32);
       border: none;
       border-radius: 14px;
       cursor: pointer;
       transition: transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 20px rgba(33, 150, 243, 0.3);
+      box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
     }
 
     .submit-btn:active {
@@ -323,9 +476,23 @@
       cursor: not-allowed;
     }
 
-    /* Footer spacing for mobile */
-    .footer-spacer {
-      height: 40px;
+    /* Progress indicator */
+    .progress-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .progress-dot {
+      flex: 1;
+      height: 4px;
+      background: #2a2a2a;
+      border-radius: 2px;
+      transition: background 0.3s;
+    }
+
+    .progress-dot.filled {
+      background: #4CAF50;
     }
   </style>
 </head>
@@ -340,6 +507,16 @@
         </svg>
       </div>
       <div class="logo-text">Zmile <span>Checkpoint</span></div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+      <div class="progress-dot" id="prog1"></div>
+      <div class="progress-dot" id="prog2"></div>
+      <div class="progress-dot" id="prog3"></div>
+      <div class="progress-dot" id="prog4"></div>
+      <div class="progress-dot" id="prog5"></div>
+      <div class="progress-dot" id="prog6"></div>
     </div>
 
     <!-- Trip Info -->
@@ -361,43 +538,35 @@
       </div>
     </div>
 
-    <!-- Hidden file input -->
-    <input 
-      type="file" 
-      id="cameraInput" 
-      accept="image/*" 
-      capture="environment"
-    >
+    <!-- Section: Required Photos -->
+    <div class="section-title">Required Photos</div>
 
-    <!-- Take Photo Button -->
-    <button class="capture-btn" id="captureBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-        <circle cx="12" cy="13" r="4"/>
-      </svg>
-      <span>Trailer Condition Photo</span>
-      <span class="capture-btn-hint">Tap to open camera</span>
-    </button>
+    <!-- Photo 1: Front Driver Corner -->
+    <div class="media-item" id="photo1Container">
+      <input type="file" class="hidden-input" id="photo1Input" accept="image/*" capture="environment">
+      
+      <div id="photo1Capture">
+        <button class="capture-btn" onclick="document.getElementById('photo1Input').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <span class="capture-btn-title">Front Driver Corner Photo</span>
+          <span class="capture-btn-hint">Tap to open camera</span>
+        </button>
+      </div>
 
-    <!-- Preview Section -->
-    <div class="preview-section" id="previewSection">
-      <div class="preview-container">
-        <div class="image-label">
-          <div class="image-label-icon">
+      <div class="preview-section" id="photo1Preview">
+        <div class="preview-label">
+          <div class="preview-label-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-              <circle cx="8.5" cy="8.5" r="1.5"/>
-              <polyline points="21 15 16 10 5 21"/>
+              <polyline points="20 6 9 17 4 12"/>
             </svg>
           </div>
-          <div class="image-label-text">
-            <div class="image-label-title">Trailer Condition Photo</div>
-            <div class="image-label-desc">Document any damage or current condition</div>
-          </div>
+          <span class="preview-label-text">Front Driver Corner Photo</span>
         </div>
-
         <div class="thumbnail-wrapper">
-          <img id="thumbnail" class="thumbnail" src="" alt="Captured photo">
+          <img id="photo1Thumb" class="thumbnail" src="" alt="Photo">
           <div class="success-badge">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
               <polyline points="20 6 9 17 4 12"/>
@@ -405,149 +574,397 @@
             Captured
           </div>
         </div>
-
         <div class="action-buttons">
-          <button class="btn-secondary btn-retake" id="retakeBtn">
-            Retake
-          </button>
-          <button class="btn-secondary btn-clear" id="clearBtn">
-            Clear
-          </button>
+          <button class="btn-small btn-retake" onclick="retakePhoto(1)">Retake</button>
+          <button class="btn-small btn-clear" onclick="clearPhoto(1)">Clear</button>
         </div>
       </div>
     </div>
 
-    <!-- Submit Button -->
+    <!-- Photo 2: Trailer Doors -->
+    <div class="media-item" id="photo2Container">
+      <input type="file" class="hidden-input" id="photo2Input" accept="image/*" capture="environment">
+      
+      <div id="photo2Capture">
+        <button class="capture-btn" onclick="document.getElementById('photo2Input').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <span class="capture-btn-title">Trailer Doors (Lights ON)</span>
+          <span class="capture-btn-hint">Tap to open camera</span>
+        </button>
+      </div>
+
+      <div class="preview-section" id="photo2Preview">
+        <div class="preview-label">
+          <div class="preview-label-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <span class="preview-label-text">Trailer Doors (Lights ON)</span>
+        </div>
+        <div class="thumbnail-wrapper">
+          <img id="photo2Thumb" class="thumbnail" src="" alt="Photo">
+          <div class="success-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Captured
+          </div>
+        </div>
+        <div class="action-buttons">
+          <button class="btn-small btn-retake" onclick="retakePhoto(2)">Retake</button>
+          <button class="btn-small btn-clear" onclick="clearPhoto(2)">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Photo 3: Passenger Side Clearance -->
+    <div class="media-item" id="photo3Container">
+      <input type="file" class="hidden-input" id="photo3Input" accept="image/*" capture="environment">
+      
+      <div id="photo3Capture">
+        <button class="capture-btn" onclick="document.getElementById('photo3Input').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <span class="capture-btn-title">Passenger Side Clearance Light</span>
+          <span class="capture-btn-hint">Tap to open camera</span>
+        </button>
+      </div>
+
+      <div class="preview-section" id="photo3Preview">
+        <div class="preview-label">
+          <div class="preview-label-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <span class="preview-label-text">Passenger Side Clearance Light</span>
+        </div>
+        <div class="thumbnail-wrapper">
+          <img id="photo3Thumb" class="thumbnail" src="" alt="Photo">
+          <div class="success-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Captured
+          </div>
+        </div>
+        <div class="action-buttons">
+          <button class="btn-small btn-retake" onclick="retakePhoto(3)">Retake</button>
+          <button class="btn-small btn-clear" onclick="clearPhoto(3)">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section: Required Video -->
+    <div class="section-title">Required Video</div>
+
+    <!-- Video -->
+    <div class="media-item" id="videoContainer">
+      <input type="file" class="hidden-input" id="videoInput" accept="video/*" capture="environment">
+      
+      <div id="videoCapture">
+        <button class="capture-btn video-btn" onclick="document.getElementById('videoInput').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="23 7 16 12 23 17 23 7"/>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+          </svg>
+          <span class="capture-btn-title">Walk-around Video</span>
+          <span class="capture-btn-hint">Tap to record video</span>
+        </button>
+      </div>
+
+      <div class="preview-section" id="videoPreview">
+        <div class="preview-label">
+          <div class="preview-label-icon video-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <span class="preview-label-text">Walk-around Video</span>
+        </div>
+        <div class="thumbnail-wrapper">
+          <video id="videoThumb" class="thumbnail" src="" muted playsinline></video>
+          <div class="success-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Recorded
+          </div>
+        </div>
+        <div class="action-buttons">
+          <button class="btn-small btn-retake" onclick="retakeVideo()">Retake</button>
+          <button class="btn-small btn-clear" onclick="clearVideo()">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section: Questions -->
+    <div class="section-title">Inspection Questions</div>
+
+    <!-- Question 1: Damages -->
+    <div class="question-card">
+      <div class="question-text">Any damages you notice?</div>
+      <div class="question-options">
+        <button class="option-btn" id="damage-yes" onclick="answerQuestion('damage', true)">Yes</button>
+        <button class="option-btn" id="damage-no" onclick="answerQuestion('damage', false)">No</button>
+      </div>
+      
+      <div class="conditional-photos" id="damagePhotos">
+        <div class="conditional-label">Please take photos of the damage:</div>
+        <div class="photo-grid" id="damagePhotoGrid"></div>
+        <input type="file" class="hidden-input" id="damagePhotoInput" accept="image/*" capture="environment">
+        <button class="add-photo-btn" onclick="document.getElementById('damagePhotoInput').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add Damage Photo
+        </button>
+      </div>
+    </div>
+
+    <!-- Question 2: Bad Tires -->
+    <div class="question-card">
+      <div class="question-text">Any bad tires or tire issues?</div>
+      <div class="question-options">
+        <button class="option-btn" id="tires-yes" onclick="answerQuestion('tires', true)">Yes</button>
+        <button class="option-btn" id="tires-no" onclick="answerQuestion('tires', false)">No</button>
+      </div>
+      
+      <div class="conditional-photos" id="tiresPhotos">
+        <div class="conditional-label">Please take photos of the tire issues:</div>
+        <div class="photo-grid" id="tiresPhotoGrid"></div>
+        <input type="file" class="hidden-input" id="tiresPhotoInput" accept="image/*" capture="environment">
+        <button class="add-photo-btn" onclick="document.getElementById('tiresPhotoInput').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add Tire Photo
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Fixed Submit Button -->
+  <div class="submit-container">
     <button class="submit-btn" id="submitBtn" disabled>
       Submit Checkpoint
     </button>
-
-    <div class="footer-spacer"></div>
   </div>
 
   <script>
-    // Initialize Telegram Web App if available
+    // Initialize Telegram Web App
     if (window.Telegram && Telegram.WebApp) {
       Telegram.WebApp.ready();
       Telegram.WebApp.expand();
-      
-      // Match Telegram theme if available
-      document.body.style.background = Telegram.WebApp.backgroundColor || '#121212';
     }
 
-    // Elements
-    const cameraInput = document.getElementById('cameraInput');
-    const captureBtn = document.getElementById('captureBtn');
-    const previewSection = document.getElementById('previewSection');
-    const thumbnail = document.getElementById('thumbnail');
-    const retakeBtn = document.getElementById('retakeBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const submitBtn = document.getElementById('submitBtn');
+    // State
+    const state = {
+      photos: {
+        1: null,
+        2: null,
+        3: null
+      },
+      video: null,
+      questions: {
+        damage: null,
+        tires: null
+      },
+      damagePhotos: [],
+      tiresPhotos: []
+    };
 
-    // Store the captured image data
-    let capturedImageData = null;
+    // Photo handling
+    for (let i = 1; i <= 3; i++) {
+      document.getElementById(`photo${i}Input`).addEventListener('change', function(e) {
+        handlePhoto(i, e.target.files[0]);
+      });
+    }
 
-    // Open camera when capture button clicked
-    captureBtn.addEventListener('click', () => {
-      cameraInput.click();
-    });
+    function handlePhoto(num, file) {
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        state.photos[num] = e.target.result;
+        
+        document.getElementById(`photo${num}Thumb`).src = e.target.result;
+        document.getElementById(`photo${num}Capture`).style.display = 'none';
+        document.getElementById(`photo${num}Preview`).classList.add('active');
+        document.getElementById(`photo${num}Container`).classList.add('completed');
+        
+        updateProgress();
+      };
+      reader.readAsDataURL(file);
+    }
 
-    // Handle file selection (photo taken)
-    cameraInput.addEventListener('change', (e) => {
+    function retakePhoto(num) {
+      document.getElementById(`photo${num}Input`).value = '';
+      document.getElementById(`photo${num}Input`).click();
+    }
+
+    function clearPhoto(num) {
+      state.photos[num] = null;
+      document.getElementById(`photo${num}Input`).value = '';
+      document.getElementById(`photo${num}Thumb`).src = '';
+      document.getElementById(`photo${num}Capture`).style.display = 'block';
+      document.getElementById(`photo${num}Preview`).classList.remove('active');
+      document.getElementById(`photo${num}Container`).classList.remove('completed');
+      
+      updateProgress();
+    }
+
+    // Video handling
+    document.getElementById('videoInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        
-        reader.onload = (event) => {
-          capturedImageData = event.target.result;
-          
-          // Save to localStorage
-          try {
-            localStorage.setItem('capturedPhoto', capturedImageData);
-          } catch (err) {
-            console.log('localStorage not available:', err);
-          }
-          
-          // Show preview
-          thumbnail.src = capturedImageData;
-          previewSection.classList.add('active');
-          submitBtn.disabled = false;
-          
-          // Update capture button to smaller version
-          captureBtn.classList.add('has-photo');
-          captureBtn.innerHTML = `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-              <circle cx="12" cy="13" r="4"/>
-            </svg>
-            <span>Take Another Photo</span>
-          `;
-        };
-        
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // Retake photo
-    retakeBtn.addEventListener('click', () => {
-      cameraInput.value = '';
-      cameraInput.click();
-    });
-
-    // Clear photo
-    clearBtn.addEventListener('click', () => {
-      capturedImageData = null;
-      thumbnail.src = '';
-      previewSection.classList.remove('active');
-      submitBtn.disabled = true;
-      cameraInput.value = '';
+      if (!file) return;
       
-      // Clear from localStorage
-      try {
-        localStorage.removeItem('capturedPhoto');
-      } catch (err) {
-        console.log('localStorage not available:', err);
+      state.video = URL.createObjectURL(file);
+      
+      const videoThumb = document.getElementById('videoThumb');
+      videoThumb.src = state.video;
+      videoThumb.load();
+      
+      document.getElementById('videoCapture').style.display = 'none';
+      document.getElementById('videoPreview').classList.add('active');
+      document.getElementById('videoContainer').classList.add('completed');
+      
+      updateProgress();
+    });
+
+    function retakeVideo() {
+      document.getElementById('videoInput').value = '';
+      document.getElementById('videoInput').click();
+    }
+
+    function clearVideo() {
+      state.video = null;
+      document.getElementById('videoInput').value = '';
+      document.getElementById('videoThumb').src = '';
+      document.getElementById('videoCapture').style.display = 'block';
+      document.getElementById('videoPreview').classList.remove('active');
+      document.getElementById('videoContainer').classList.remove('completed');
+      
+      updateProgress();
+    }
+
+    // Question handling
+    function answerQuestion(question, isYes) {
+      state.questions[question] = isYes;
+      
+      // Update button states
+      document.getElementById(`${question}-yes`).className = 'option-btn' + (isYes ? ' selected-yes' : '');
+      document.getElementById(`${question}-no`).className = 'option-btn' + (!isYes ? ' selected-no' : '');
+      
+      // Show/hide conditional photos
+      const photosSection = document.getElementById(`${question}Photos`);
+      if (isYes) {
+        photosSection.classList.add('active');
+      } else {
+        photosSection.classList.remove('active');
       }
       
-      // Reset capture button
-      captureBtn.classList.remove('has-photo');
-      captureBtn.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-          <circle cx="12" cy="13" r="4"/>
-        </svg>
-        <span>Trailer Condition Photo</span>
-        <span class="capture-btn-hint">Tap to open camera</span>
-      `;
+      updateProgress();
+    }
+
+    // Conditional photo handling
+    document.getElementById('damagePhotoInput').addEventListener('change', function(e) {
+      addConditionalPhoto('damage', e.target.files[0]);
     });
 
-    // Submit button
-    submitBtn.addEventListener('click', () => {
-      console.log('Submit clicked. Image data:', capturedImageData ? 'Present' : 'None');
+    document.getElementById('tiresPhotoInput').addEventListener('change', function(e) {
+      addConditionalPhoto('tires', e.target.files[0]);
     });
 
-    // Load saved photo on page load
-    window.addEventListener('load', () => {
-      try {
-        const savedPhoto = localStorage.getItem('capturedPhoto');
-        if (savedPhoto) {
-          capturedImageData = savedPhoto;
-          thumbnail.src = capturedImageData;
-          previewSection.classList.add('active');
-          submitBtn.disabled = false;
-          captureBtn.classList.add('has-photo');
-          captureBtn.innerHTML = `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-              <circle cx="12" cy="13" r="4"/>
-            </svg>
-            <span>Take Another Photo</span>
-          `;
-        }
-      } catch (err) {
-        console.log('localStorage not available:', err);
-      }
+    function addConditionalPhoto(type, file) {
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const photos = type === 'damage' ? state.damagePhotos : state.tiresPhotos;
+        const index = photos.length;
+        photos.push(e.target.result);
+        
+        const grid = document.getElementById(`${type}PhotoGrid`);
+        const thumb = document.createElement('div');
+        thumb.className = 'photo-thumb';
+        thumb.id = `${type}-photo-${index}`;
+        thumb.innerHTML = `
+          <img src="${e.target.result}" alt="Photo">
+          <button class="photo-thumb-remove" onclick="removeConditionalPhoto('${type}', ${index})">×</button>
+        `;
+        grid.appendChild(thumb);
+        
+        // Reset input
+        document.getElementById(`${type}PhotoInput`).value = '';
+        
+        updateProgress();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeConditionalPhoto(type, index) {
+      const photos = type === 'damage' ? state.damagePhotos : state.tiresPhotos;
+      photos[index] = null;
+      
+      const thumb = document.getElementById(`${type}-photo-${index}`);
+      if (thumb) thumb.remove();
+      
+      updateProgress();
+    }
+
+    // Progress and validation
+    function updateProgress() {
+      const checks = [
+        state.photos[1] !== null,
+        state.photos[2] !== null,
+        state.photos[3] !== null,
+        state.video !== null,
+        state.questions.damage !== null,
+        state.questions.tires !== null
+      ];
+      
+      // Update progress dots
+      checks.forEach((check, i) => {
+        document.getElementById(`prog${i + 1}`).classList.toggle('filled', check);
+      });
+      
+      // Check if all required items are complete
+      const allPhotos = checks.slice(0, 4).every(Boolean);
+      const allQuestions = checks.slice(4).every(Boolean);
+      
+      // If answered yes to damage, need at least one photo
+      const damageValid = state.questions.damage === null || 
+                          state.questions.damage === false || 
+                          state.damagePhotos.filter(p => p !== null).length > 0;
+      
+      // If answered yes to tires, need at least one photo
+      const tiresValid = state.questions.tires === null || 
+                         state.questions.tires === false || 
+                         state.tiresPhotos.filter(p => p !== null).length > 0;
+      
+      const canSubmit = allPhotos && allQuestions && damageValid && tiresValid;
+      
+      document.getElementById('submitBtn').disabled = !canSubmit;
+    }
+
+    // Submit
+    document.getElementById('submitBtn').addEventListener('click', () => {
+      console.log('Submitting checkpoint:', state);
+      // Does nothing else as requested
     });
+
+    // Initialize
+    updateProgress();
   </script>
 </body>
 </html>
